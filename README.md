@@ -34,15 +34,27 @@ docker run -p 8080:80 sudamericana-dashboard   # http://localhost:8080
 Para otro webhook: `docker build --build-arg VITE_WEBHOOK_URL=https://... .`
 (es build-arg, no variable de runtime: Vite la inyecta en el bundle al compilar).
 
+## Repos y flujo de deploy
+
+- **Repo de trabajo (este):** `aiporvos/sudamericanabebidas` — toda la solución (agentes, docs, workflows, dashboard).
+- **Repo de deploy:** `aiporvos/sudamericanabebidas-dashboard` — solo el contenido de `apps/dashboard`, en la raíz. Es el que mira Dokploy.
+
+Para publicar cambios del dashboard (desde la raíz del repo de trabajo):
+
+```bash
+git add apps/dashboard && git commit -m "dashboard: <cambio>"
+git subtree push --prefix=apps/dashboard dashboard main
+```
+
+(el remote `dashboard` apunta a `git@github-aiporvos:aiporvos/sudamericanabebidas-dashboard.git`)
+
 ## Deploy en Dokploy
 
 1. En el proyecto **Sudamericana** → *Create Service* → **Application**.
-2. Source: este repo de GitHub, branch `main`.
-3. Build type: **Dockerfile**, con:
-   - *Docker File*: `apps/dashboard/Dockerfile`
-   - *Docker Context Path*: `apps/dashboard`
+2. Source: GitHub → repo **`sudamericanabebidas-dashboard`**, branch `main`, Build Path `/`, Trigger `On Push`.
+3. Build type: **Dockerfile**, *Docker File*: `Dockerfile` (está en la raíz del repo de deploy).
 4. En *Domains* agregá el dominio (p. ej. `calidad.aiporvos.com`), puerto **80**, HTTPS con Let's Encrypt.
-5. Deploy. Cada push a `main` puede redeployar con la GitHub App de Dokploy (o botón *Deploy*).
+5. Deploy. Cada `git subtree push` redeploya automáticamente.
 
 ### ⚠️ CORS del WF6 (imprescindible)
 
