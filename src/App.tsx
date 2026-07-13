@@ -7,11 +7,15 @@ import { KpiCard } from './components/KpiCard';
 import { Graficos, pctOk } from './components/Charts';
 import { DataTable } from './components/DataTable';
 import { DetalleModal } from './components/DetalleModal';
+import { Login } from './components/Login';
+import { cerrarSesion, estaAutenticado } from './auth';
 import { fmtDuracion, percentil } from './format';
+import logo from './assets/logo-sudamericana.png';
 
 type Fuente = 'webhook' | 'ejemplo';
 
 export default function App() {
+  const [autenticado, setAutenticado] = useState(estaAutenticado());
   const [evidencias, setEvidencias] = useState<Evidencia[]>([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +42,7 @@ export default function App() {
     }
   };
 
-  useEffect(() => { void cargar(); }, []);
+  useEffect(() => { if (autenticado) void cargar(); }, [autenticado]);
 
   // ── Filtrado en memoria ──
   const filtradas = useMemo(() => {
@@ -87,19 +91,29 @@ export default function App() {
   const tiposDisponibles = useMemo(
     () => [...new Set(evidencias.map((e) => e.tipoFoto ?? 'otro'))].sort(), [evidencias]);
 
+  if (!autenticado) {
+    return <Login onSuccess={() => setAutenticado(true)} />;
+  }
+
   return (
     <>
       <header className="header">
         <div className="header-inner">
-          <div className="brand">
-            <span className="brand-title">SUDAMERICANA · CALIDAD</span>
-            <span className="brand-sub">Calidad de Lata — evidencias procesadas por IA (Telegram → n8n → gpt-4o)</span>
+          <div className="brand" style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <img src={logo} alt="" className="header-logo" />
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span className="brand-title">SUDAMERICANA · CALIDAD</span>
+              <span className="brand-sub">Calidad de Lata — evidencias procesadas por IA (Telegram → n8n → gpt-4o)</span>
+            </div>
           </div>
           <div className="header-right">
             {fuente === 'ejemplo' && <span className="chip" style={{ color: 'var(--warn)' }}>⚠ datos de ejemplo</span>}
             {actualizado && <span className="chip">actualizado {fmtFechaHora(actualizado)}</span>}
             <button className="btn" onClick={() => void cargar()} disabled={cargando}>
               {cargando ? <span className="spin">⟳</span> : '⟳'} Actualizar
+            </button>
+            <button className="btn btn-ghost" onClick={() => { cerrarSesion(); setAutenticado(false); }}>
+              Salir
             </button>
           </div>
         </div>

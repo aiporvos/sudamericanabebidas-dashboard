@@ -163,6 +163,87 @@ tbody tr:hover { background: var(--border); }
 .section-title { font-size: 15px; font-weight: 700; margin: 22px 0 4px; }
 .section-sub { font-size: 12px; color: var(--text-2); margin-bottom: 10px; }
 
+/* ── Login ─────────────────────────────────────────────────────────────── */
+.login-screen {
+  position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: var(--bg); overflow: hidden; padding: 20px;
+}
+/* Grilla técnica muy sutil, en línea con la identidad "blueprint" del sistema */
+.login-grid {
+  position: absolute; inset: -2px;
+  background-image:
+    linear-gradient(rgba(0, 201, 167, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 201, 167, 0.05) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(ellipse at center, black 0%, transparent 75%);
+}
+.login-glow {
+  position: absolute; width: 560px; height: 560px; border-radius: 50%;
+  filter: blur(110px); opacity: 0.28; pointer-events: none;
+  animation: derivar 12s ease-in-out infinite alternate;
+}
+.login-glow-teal { background: var(--teal); top: -180px; left: -160px; }
+.login-glow-purple { background: var(--purple); bottom: -200px; right: -160px; animation-delay: -6s; }
+@keyframes derivar {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(30px, -20px) scale(1.08); }
+}
+
+.login-card {
+  position: relative; z-index: 1; width: 100%; max-width: 380px;
+  background: rgba(21, 24, 32, 0.72); backdrop-filter: blur(16px);
+  border: 1px solid var(--border-2); border-radius: 16px;
+  padding: 36px 32px 28px; display: flex; flex-direction: column; align-items: center;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 201, 167, 0.04);
+  animation: entrada 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes entrada { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: none; } }
+
+.login-logo { width: 220px; max-width: 80%; height: auto; margin-bottom: 18px; filter: drop-shadow(0 4px 18px rgba(0, 201, 167, 0.18)); }
+.login-title { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 700; letter-spacing: 0.06em; color: var(--text); text-transform: uppercase; }
+.login-sub { font-size: 12px; color: var(--text-2); margin-top: 4px; margin-bottom: 26px; }
+
+.login-field { position: relative; width: 100%; margin-bottom: 6px; }
+.login-input {
+  width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--border-2);
+  border-radius: 10px; padding: 12px 42px 12px 14px; font-family: 'DM Sans', sans-serif;
+  font-size: 14px; outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+}
+.login-input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(0, 201, 167, 0.12); }
+.login-field-error .login-input { border-color: var(--bad); box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.12); }
+.login-eye {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer; font-size: 15px; padding: 6px; opacity: 0.7;
+}
+.login-eye:hover { opacity: 1; }
+
+.login-error { align-self: flex-start; font-size: 12px; color: var(--bad); margin: 6px 0 4px; }
+
+.login-submit {
+  width: 100%; margin-top: 16px; padding: 12px; border-radius: 10px; border: none;
+  background: linear-gradient(135deg, var(--teal), #00a98c); color: #06231d;
+  font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: filter 0.15s, transform 0.1s;
+}
+.login-submit:hover:not(:disabled) { filter: brightness(1.08); }
+.login-submit:active:not(:disabled) { transform: scale(0.98); }
+.login-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+.login-arrow { transition: transform 0.15s; }
+.login-submit:hover:not(:disabled) .login-arrow { transform: translateX(3px); }
+
+.login-footer { margin-top: 22px; font-size: 10px; letter-spacing: 0.08em; color: var(--text-2); text-transform: uppercase; }
+
+.login-shake { animation: sacudir 0.4s; }
+@keyframes sacudir {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(4px); }
+  30%, 50%, 70% { transform: translateX(-7px); }
+  40%, 60% { transform: translateX(7px); }
+}
+
+.header-logo { height: 26px; width: auto; margin-right: 2px; }
+
 /* ── Modal de detalle de evidencia ── */
 .fila-click { cursor: pointer; }
 .modal-back {
