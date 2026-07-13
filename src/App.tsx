@@ -6,6 +6,8 @@ import { FiltersBar, FILTROS_VACIOS, type Filtros } from './components/FiltersBa
 import { KpiCard } from './components/KpiCard';
 import { Graficos, pctOk } from './components/Charts';
 import { DataTable } from './components/DataTable';
+import { DetalleModal } from './components/DetalleModal';
+import { fmtDuracion, percentil } from './format';
 
 type Fuente = 'webhook' | 'ejemplo';
 
@@ -16,6 +18,7 @@ export default function App() {
   const [fuente, setFuente] = useState<Fuente>('webhook');
   const [actualizado, setActualizado] = useState<Date | null>(null);
   const [filtros, setFiltros] = useState<Filtros>({ ...FILTROS_VACIOS });
+  const [detalle, setDetalle] = useState<Evidencia | null>(null);
 
   const cargar = async () => {
     setCargando(true);
@@ -72,7 +75,11 @@ export default function App() {
     const confMedia = conConf.length > 0
       ? conConf.reduce((s, e) => s + (e.confianza ?? 0), 0) / conConf.length : 0;
     const tokens = activas.reduce((s, e) => s + e.tokens, 0);
-    return { total: activas.length, ok: pctOk(activas), noOk, pendientes, confMedia, tokens };
+    const latencias = activas
+      .map((e) => e.latenciaSegundos)
+      .filter((l): l is number => l !== null);
+    const latP95 = percentil(latencias, 0.95);
+    return { total: activas.length, ok: pctOk(activas), noOk, pendientes, confMedia, tokens, latP95 };
   }, [filtradas]);
 
   const lineasDisponibles = useMemo(
@@ -124,6 +131,10 @@ export default function App() {
           <KpiCard loading={cargando} label="Revisión manual" icon="👁️" value={kpis.pendientes} render={(v) => fmtInt(Math.round(v))} color={kpis.pendientes > 0 ? 'var(--warn)' : 'var(--text)'} sub="pendientes en la bandeja (WF4)" />
           <KpiCard loading={cargando} label="Confianza media" icon="🎯" value={kpis.confMedia} render={(v) => fmtPct(v)} progress={kpis.confMedia} sub="umbral de derivación: 85%" />
           <KpiCard loading={cargando} label="Tokens IA" icon="🧠" value={kpis.tokens} render={(v) => fmtInt(Math.round(v))} color="var(--purple)" sub={`costo estimado ${fmtUsd(kpis.tokens)}`} />
+          <KpiCard loading={cargando} label="Latencia p95" icon="⚡" value={kpis.latP95 ?? 0}
+            render={(v) => (kpis.latP95 === null ? '—' : fmtDuracion(v))}
+            color={kpis.latP95 !== null && kpis.latP95 > 120 ? 'var(--warn)' : 'var(--text)'}
+            sub="Telegram → resultado IA" />
         </div>
 
         <Graficos evidencias={filtradas} />
@@ -132,8 +143,10 @@ export default function App() {
         <div className="section-sub">
           Detalle por foto: resultado, confianza, coherencia lata↔tablero y textos leídos por la IA.
         </div>
-        <DataTable evidencias={filtradas} />
+        <DataTable evidencias={filtradas} onSelect={setDetalle} />
       </main>
+
+      {detalle && <DetalleModal evidencia={detalle} onClose={() => setDetalle(null)} />}
     </>
   );
 }

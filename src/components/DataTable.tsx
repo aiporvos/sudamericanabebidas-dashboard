@@ -22,7 +22,7 @@ function BadgeEstado({ e }: { e: Evidencia }) {
   return <span className="badge badge-ok">procesado</span>;
 }
 
-export function DataTable({ evidencias }: { evidencias: Evidencia[] }) {
+export function DataTable({ evidencias, onSelect }: { evidencias: Evidencia[]; onSelect: (e: Evidencia) => void }) {
   const [orden, setOrden] = useState<{ col: ColKey; asc: boolean }>({ col: 'fecha', asc: false });
   const [pagina, setPagina] = useState(0);
 
@@ -77,7 +77,8 @@ export function DataTable({ evidencias }: { evidencias: Evidencia[] }) {
           </thead>
           <tbody>
             {visibles.map((e) => (
-              <tr key={e.evidenceId} title={e.evidenceId}>
+              <tr key={e.evidenceId} title={`${e.evidenceId} — clic para ver el detalle y la foto`}
+                  className="fila-click" onClick={() => onSelect(e)}>
                 <td className="t-mono" style={{ whiteSpace: 'nowrap' }}>{fmtFechaHora(e.fecha)}</td>
                 <td>
                   {e.linea}

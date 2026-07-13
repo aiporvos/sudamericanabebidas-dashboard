@@ -21,6 +21,7 @@ export interface Evidencia {
   horaPantalla: string | null;
   tokens: number;
   revisadoPor: string | null;
+  latenciaSegundos: number | null; // evaluado_en - capturado_en (Telegram → resultado IA)
 }
 
 // Fila cruda tal como la devuelve el webhook (columnas de v_evidencias_completas).
@@ -43,4 +44,5 @@ export interface RawEvidencia {
   hora_pantalla?: string | null;
   tokens?: number | string | null;
   revisado_por?: string | null;
+  latencia_segundos?: number | string | null;
 }

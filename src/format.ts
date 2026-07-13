@@ -26,6 +26,21 @@ export const fmtFecha = (d: Date): string => format(d, 'dd/MM/yyyy');
 export const fmtFechaHora = (d: Date): string => format(d, 'dd/MM/yyyy HH:mm');
 export const fmtDiaMes = (d: Date): string => format(d, 'dd/MM');
 
+// Duración corta: 45 → "45 s" · 130 → "2 m 10 s"
+export function fmtDuracion(seg: number): string {
+  const s = Math.round(seg);
+  if (s < 60) return `${s} s`;
+  return `${Math.floor(s / 60)} m ${String(s % 60).padStart(2, '0')} s`;
+}
+
+// Percentil (p 0..1) sobre una lista de números; null si no hay datos
+export function percentil(valores: number[], p: number): number | null {
+  if (valores.length === 0) return null;
+  const orden = [...valores].sort((a, b) => a - b);
+  const idx = Math.min(orden.length - 1, Math.ceil(p * orden.length) - 1);
+  return orden[Math.max(0, idx)];
+}
+
 // Etiquetas legibles para tipo de foto
 export const TIPO_FOTO_LABEL: Record<string, string> = {
   tapa: 'Tapa',

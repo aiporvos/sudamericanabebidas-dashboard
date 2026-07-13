@@ -5,6 +5,11 @@ export const WEBHOOK_URL: string =
   (import.meta as any).env?.VITE_WEBHOOK_URL ??
   'https://n8n.aiporvos.com/webhook/dashboard-calidad';
 
+// Endpoint de la foto original (mismo WF6, path <webhook>-imagen). Se usa en <img>,
+// que no exige CORS, así que sirve directo desde n8n → MinIO.
+export const imagenUrl = (evidenceId: string): string =>
+  `${WEBHOOK_URL}-imagen?id=${encodeURIComponent(evidenceId)}`;
+
 // ── Normalización del JSON crudo del webhook al tipo interno Evidencia ─────
 // defectos/textos llegan como jsonb (array) pero pueden venir serializados como string.
 function toArray(v: string[] | string | null | undefined): string[] {
@@ -44,6 +49,10 @@ export function normalizar(raw: RawEvidencia): Evidencia | null {
     horaPantalla: raw.hora_pantalla ?? null,
     tokens: Number(raw.tokens) || 0,
     revisadoPor: raw.revisado_por ?? null,
+    latenciaSegundos:
+      raw.latencia_segundos === null || raw.latencia_segundos === undefined || isNaN(Number(raw.latencia_segundos))
+        ? null
+        : Number(raw.latencia_segundos),
   };
 }
 
