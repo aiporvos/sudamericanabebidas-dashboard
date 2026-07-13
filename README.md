@@ -52,11 +52,12 @@ Componente en `src/components/ChatWidget.tsx`, lógica de sesión/fetch en `src/
   `{ "session_id": "...", "mensaje": "..." }`, respuesta esperada `{ "respuesta": "..." }`.
   Timeout de 30s con `AbortController`.
 
-> ⚠️ **El webhook todavía NO EXISTE en n8n** (falta construir un workflow nuevo, ej.
-> "Calidad de Lata — 7) Chat Asistente IA", con nodo AI Agent + lectura de
-> evidencias/resultados en Postgres, y CORS `Allowed Origins` = `https://dashboard.cluna.ar`
-> igual que WF6). Hasta entonces, el chat funciona visualmente pero cualquier mensaje
-> enviado muestra el error de conexión — es el comportamiento esperado, no un bug.
+Backend: **WF7 "Chat Asistente IA"** en n8n (`workflows/calidad-lata-7-chat-asistente.json`) —
+AI Agent (OpenRouter gpt-4o-mini) + memoria de sesión + tool que consulta
+`v_evidencias_completas` vía el sub-workflow **WF7b** (`calidad-lata-7b-tool-evidencias.json`).
+Probado end-to-end con datos reales (conteos, casos de incoherencia, comparación entre
+líneas, memoria de sesión en preguntas de seguimiento). Detalles y gotchas de esa build en
+`workflows/calidad-lata.README.md`.
 
 ## Docker
 
