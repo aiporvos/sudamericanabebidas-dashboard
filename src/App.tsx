@@ -7,6 +7,7 @@ import { KpiCard } from './components/KpiCard';
 import { Graficos, pctOk } from './components/Charts';
 import { DataTable } from './components/DataTable';
 import { DetalleModal } from './components/DetalleModal';
+import { ChatWidget } from './components/ChatWidget';
 import { Login } from './components/Login';
 import { cerrarSesion, estaAutenticado } from './auth';
 import { fmtDuracion, percentil } from './format';
@@ -161,6 +162,7 @@ export default function App() {
       </main>
 
       {detalle && <DetalleModal evidencia={detalle} onClose={() => setDetalle(null)} />}
+      <ChatWidget />
     </>
   );
 }

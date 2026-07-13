@@ -11,6 +11,7 @@ workflow **WF6 «API Dashboard»** (`GET /webhook/dashboard-calidad`, consulta
 - **Tabla:** ordenable y paginada, con coherencia lata↔tablero, defectos y textos leídos.
 - **Detalle con foto:** clic en una fila abre un modal con la imagen original (MinIO) y todos los campos.
 - **Login** con logo de Sudamericana Bebidas — gate de acceso simple (ver abajo).
+- **Chat "Lupa"** — asistente IA flotante, integrado con n8n (ver abajo).
 - Si el webhook no responde, muestra **datos de ejemplo** con un banner de aviso.
 
 ## Desarrollo local
@@ -37,6 +38,25 @@ componente en `src/components/Login.tsx`.
 
 Para cambiar la contraseña en producción: `docker build --build-arg VITE_DASHBOARD_PASSWORD=<clave> .`
 o el equivalente en Dokploy (Environment → build args).
+
+## Chat "Lupa" (asistente IA)
+
+Burbuja flotante abajo a la derecha (bottom sheet en móvil) que abre un panel de chat.
+Componente en `src/components/ChatWidget.tsx`, lógica de sesión/fetch en `src/chat.ts`.
+
+- **Sesión**: `sessionId` persistido en `localStorage` (`sudamericana_calidad_chat_session`)
+  para que n8n pueda mantener contexto entre recargas. Botón "Nueva sesión" en la cabecera
+  del chat lo resetea.
+- **Endpoint**: `POST` a `VITE_CHAT_WEBHOOK_URL` (default:
+  `https://n8n.aiporvos.com/webhook/dashboard-calidad-chat`), body
+  `{ "session_id": "...", "mensaje": "..." }`, respuesta esperada `{ "respuesta": "..." }`.
+  Timeout de 30s con `AbortController`.
+
+> ⚠️ **El webhook todavía NO EXISTE en n8n** (falta construir un workflow nuevo, ej.
+> "Calidad de Lata — 7) Chat Asistente IA", con nodo AI Agent + lectura de
+> evidencias/resultados en Postgres, y CORS `Allowed Origins` = `https://dashboard.cluna.ar`
+> igual que WF6). Hasta entonces, el chat funciona visualmente pero cualquier mensaje
+> enviado muestra el error de conexión — es el comportamiento esperado, no un bug.
 
 ## Docker
 
