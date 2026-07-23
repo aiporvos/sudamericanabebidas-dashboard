@@ -12,8 +12,24 @@ function Campo({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
+// Formulario de WF4 (bandeja de revisión manual) — el revisor pega ahí el Evidence ID.
+const FORM_REVISION_URL: string =
+  (import.meta as any).env?.VITE_FORM_REVISION_URL ??
+  'https://n8n.aiporvos.com/form/4b10e382-a130-459a-af18-9d515ff434b3';
+
 export function DetalleModal({ evidencia, onClose }: { evidencia: Evidencia; onClose: () => void }) {
   const [imgEstado, setImgEstado] = useState<'cargando' | 'ok' | 'error'>('cargando');
+  const [copiado, setCopiado] = useState(false);
+
+  const copiarId = async () => {
+    try {
+      await navigator.clipboard.writeText(evidencia.evidenceId);
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 1600);
+    } catch {
+      // clipboard bloqueado (http o permisos): selección manual como siempre
+    }
+  };
 
   useEffect(() => {
     setImgEstado('cargando');
@@ -33,7 +49,21 @@ export function DetalleModal({ evidencia, onClose }: { evidencia: Evidencia; onC
         <div className="modal-head">
           <div>
             <div className="chart-title">Evidencia</div>
-            <div className="t-mono" style={{ fontSize: 11, color: 'var(--text-2)' }}>{e.evidenceId}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <span className="t-mono" style={{ fontSize: 11, color: 'var(--text-2)' }}>{e.evidenceId}</span>
+              <button className="btn" style={{ padding: '3px 10px', fontSize: 10 }} onClick={() => void copiarId()}>
+                {copiado ? '✓ Copiado' : '⧉ Copiar ID'}
+              </button>
+              {e.estadoResultado === 'revision_manual' && (
+                <button
+                  className="btn"
+                  style={{ padding: '3px 10px', fontSize: 10, background: 'var(--primary)', color: 'var(--tinta)' }}
+                  onClick={() => { void copiarId(); window.open(FORM_REVISION_URL, '_blank', 'noopener'); }}
+                >
+                  👁 Revisar (abre la bandeja)
+                </button>
+              )}
+            </div>
           </div>
           <button className="btn" onClick={onClose}>✕ Cerrar</button>
         </div>
