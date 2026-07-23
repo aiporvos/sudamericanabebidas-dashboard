@@ -90,7 +90,7 @@ export function Graficos({ evidencias }: { evidencias: Evidencia[] }) {
               <CartesianGrid stroke={GRID} vertical={false} />
               <XAxis dataKey="dia" {...ejes} />
               <YAxis {...ejes} allowDecimals={false} tickFormatter={abrev} />
-              <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'rgba(107,122,145,0.08)' }} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'var(--chart-cursor)' }} />
               <Legend {...leyenda} />
               <Bar dataKey="OK" stackId="r" fill={SERIE.ok} {...gap} />
               <Bar dataKey="No OK" stackId="r" fill={SERIE.noOk} {...gap} />
@@ -107,7 +107,7 @@ export function Graficos({ evidencias }: { evidencias: Evidencia[] }) {
               <CartesianGrid stroke={GRID} horizontal={false} />
               <XAxis type="number" {...ejes} allowDecimals={false} tickFormatter={abrev} />
               <YAxis type="category" dataKey="linea" {...ejes} width={90} />
-              <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'rgba(107,122,145,0.08)' }} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'var(--chart-cursor)' }} />
               <Legend {...leyenda} />
               <Bar dataKey="OK" stackId="l" fill={SERIE.ok} {...gap} />
               <Bar dataKey="No OK" stackId="l" fill={SERIE.noOk} {...gap} />
@@ -124,7 +124,7 @@ export function Graficos({ evidencias }: { evidencias: Evidencia[] }) {
               <CartesianGrid stroke={GRID} horizontal={false} />
               <XAxis type="number" {...ejes} allowDecimals={false} tickFormatter={abrev} />
               <YAxis type="category" dataKey="tipo" {...ejes} width={130} />
-              <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'rgba(107,122,145,0.08)' }} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'var(--chart-cursor)' }} />
               <Bar dataKey="cantidad" name="Fotos" fill={SERIE.acento} {...gap} radius={[0, 4, 4, 0]}>
                 <LabelList dataKey="cantidad" position="right" fill={EJE} fontSize={11} formatter={(v: number) => fmtInt(v)} />
                 {tipos.map((t) => <Cell key={t.tipo} fill={SERIE.acento} />)}

@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-// Presentación del demo para el cliente: navegable con flechas (teclado o botones),
-// lenguaje simple, cada tema cierra con su beneficio concreto.
+// Presentación del demo para el cliente: modo lectura (tarjeta en la pestaña) y
+// modo "Presentar" a pantalla completa (Fullscreen API + overlay), navegable con
+// ← → , botones o los puntos. Esc sale. Lenguaje simple; cada tema cierra con
+// su beneficio.
 
 function Flujo({ pasos }: { pasos: string[] }) {
   return (
@@ -20,8 +22,9 @@ function Beneficio({ children }: { children: React.ReactNode }) {
   return <div className="pres-beneficio">✦ <b>Beneficio:</b>&nbsp;{children}</div>;
 }
 
-const SLIDES: { titulo: string; cuerpo: React.ReactNode }[] = [
+const SLIDES: { emoji: string; titulo: string; cuerpo: React.ReactNode }[] = [
   {
+    emoji: '🥫',
     titulo: 'El problema y la solución',
     cuerpo: (
       <>
@@ -40,6 +43,7 @@ const SLIDES: { titulo: string; cuerpo: React.ReactNode }[] = [
     ),
   },
   {
+    emoji: '💬',
     titulo: '¿Por qué Telegram y no WhatsApp?',
     cuerpo: (
       <>
@@ -67,6 +71,7 @@ const SLIDES: { titulo: string; cuerpo: React.ReactNode }[] = [
     ),
   },
   {
+    emoji: '👋',
     titulo: 'Cómo sumarse al grupo',
     cuerpo: (
       <>
@@ -84,6 +89,7 @@ const SLIDES: { titulo: string; cuerpo: React.ReactNode }[] = [
     ),
   },
   {
+    emoji: '⚙️',
     titulo: 'Cómo funciona por dentro (simple)',
     cuerpo: (
       <>
@@ -102,6 +108,7 @@ const SLIDES: { titulo: string; cuerpo: React.ReactNode }[] = [
     ),
   },
   {
+    emoji: '🔁',
     titulo: 'Cómo evita duplicados',
     cuerpo: (
       <>
@@ -122,6 +129,7 @@ const SLIDES: { titulo: string; cuerpo: React.ReactNode }[] = [
     ),
   },
   {
+    emoji: '🧩',
     titulo: 'Cómo agrupa las fotos de una tanda',
     cuerpo: (
       <>
@@ -135,13 +143,14 @@ const SLIDES: { titulo: string; cuerpo: React.ReactNode }[] = [
           ¿El <b>vencimiento</b>? ¿La <b>hora</b>? Cualquier diferencia dispara una alerta al grupo con la
           evidencia adjunta.
         </p>
-        <Flujo pasos={['🖥 Pantalla: LOTE 198 · VTO 13/04/27', '🥫 Lata: LOTE 198 · VTO 13/04/27', '✔ Coherente']} />
-        <Flujo pasos={['🖥 Pantalla: LOTE 198', '🥫 Lata: LOTE 117', '🚨 Alerta: lote distinto']} />
+        <Flujo pasos={['🖥 Pantalla: LOTE 202 · VTO 17/04/27', '🥫 Lata: LOTE 202 · VTO 17/04/27', '✔ Coherente']} />
+        <Flujo pasos={['🖥 Pantalla: LOTE 202', '🥫 Lata: LOTE 117', '🚨 Alerta: lote distinto']} />
         <Beneficio>detecta un codificador mal configurado en minutos, no cuando el cliente reclama.</Beneficio>
       </>
     ),
   },
   {
+    emoji: '🧪',
     titulo: 'Cómo lo probamos hoy',
     cuerpo: (
       <>
@@ -162,6 +171,7 @@ const SLIDES: { titulo: string; cuerpo: React.ReactNode }[] = [
     ),
   },
   {
+    emoji: '🚀',
     titulo: 'Beneficios y qué sigue',
     cuerpo: (
       <>
@@ -180,17 +190,80 @@ const SLIDES: { titulo: string; cuerpo: React.ReactNode }[] = [
 
 export function PresentacionTab() {
   const [slide, setSlide] = useState(0);
+  const [presentando, setPresentando] = useState(false);
+  const overlayRef = useRef<HTMLDivElement>(null);
+
+  const anterior = useCallback(() => setSlide((s) => Math.max(s - 1, 0)), []);
+  const siguiente = useCallback(() => setSlide((s) => Math.min(s + 1, SLIDES.length - 1)), []);
+
+  const presentar = () => {
+    setPresentando(true);
+    // Fullscreen real si el navegador lo permite; si no, el overlay fixed alcanza.
+    setTimeout(() => overlayRef.current?.requestFullscreen?.().catch(() => {}), 0);
+  };
+  const salir = useCallback(() => {
+    setPresentando(false);
+    if (document.fullscreenElement) void document.exitFullscreen().catch(() => {});
+  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') setSlide((s) => Math.min(s + 1, SLIDES.length - 1));
-      if (e.key === 'ArrowLeft') setSlide((s) => Math.max(s - 1, 0));
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') siguiente();
+      if (e.key === 'ArrowLeft' || e.key === 'PageUp') anterior();
+      if (e.key === 'Escape') salir();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  }, [anterior, siguiente, salir]);
+
+  // Si el usuario sale del fullscreen con Esc nativo, cerrar también el overlay.
+  useEffect(() => {
+    const onFs = () => { if (!document.fullscreenElement && presentando) setPresentando(false); };
+    document.addEventListener('fullscreenchange', onFs);
+    return () => document.removeEventListener('fullscreenchange', onFs);
+  }, [presentando]);
 
   const s = SLIDES[slide];
+
+  const navegacion = (
+    <div className="pres-nav">
+      <button className="btn" onClick={anterior} disabled={slide === 0}>← Anterior</button>
+      <div className="pres-dots">
+        {SLIDES.map((_, i) => (
+          <button key={i} className={`pres-dot${i === slide ? ' activa' : ''}`} onClick={() => setSlide(i)}
+            aria-label={`Ir a la sección ${i + 1}`} />
+        ))}
+      </div>
+      <button className="btn" onClick={siguiente} disabled={slide === SLIDES.length - 1}>Siguiente →</button>
+    </div>
+  );
+
+  if (presentando) {
+    return (
+      <div className="pres-full" ref={overlayRef}>
+        <div className="pres-full-head">
+          <span className="chip">{slide + 1} / {SLIDES.length}</span>
+          <button className="btn" onClick={salir}>✕ Salir (Esc)</button>
+        </div>
+        <div className="pres-full-slide" key={slide}>
+          <div className="pres-full-emoji">{s.emoji}</div>
+          <h2 className="pres-titulo pres-titulo-full">{s.titulo}</h2>
+          <div className="pres-cuerpo pres-cuerpo-full">{s.cuerpo}</div>
+        </div>
+        <div className="pres-full-nav">
+          <button className="btn pres-flecha" onClick={anterior} disabled={slide === 0} aria-label="Anterior">←</button>
+          <div className="pres-dots">
+            {SLIDES.map((_, i) => (
+              <button key={i} className={`pres-dot${i === slide ? ' activa' : ''}`} onClick={() => setSlide(i)}
+                aria-label={`Ir a la sección ${i + 1}`} />
+            ))}
+          </div>
+          <button className="btn pres-flecha" onClick={siguiente} disabled={slide === SLIDES.length - 1} aria-label="Siguiente">→</button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="pres">
       <div className="pres-head">
@@ -200,26 +273,20 @@ export function PresentacionTab() {
             Calidad de Lata — cómo funciona y por qué. Navegá con ← → o los botones.
           </div>
         </div>
-        <span className="chip">{slide + 1} / {SLIDES.length}</span>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <span className="chip">{slide + 1} / {SLIDES.length}</span>
+          <button className="btn pres-cta" onClick={presentar}>▶ Presentar</button>
+        </div>
       </div>
 
-      <div className="card pres-slide">
-        <div className="pres-num t-mono">{String(slide + 1).padStart(2, '0')}</div>
+      <div className="card pres-slide" key={slide}>
+        <div className="pres-num">{String(slide + 1).padStart(2, '0')}</div>
+        <div className="pres-emoji">{s.emoji}</div>
         <h2 className="pres-titulo">{s.titulo}</h2>
         <div className="pres-cuerpo">{s.cuerpo}</div>
       </div>
 
-      <div className="pres-nav">
-        <button className="btn" onClick={() => setSlide((x) => Math.max(x - 1, 0))} disabled={slide === 0}>← Anterior</button>
-        <div className="pres-dots">
-          {SLIDES.map((_, i) => (
-            <button key={i} className={`pres-dot${i === slide ? ' activa' : ''}`} onClick={() => setSlide(i)}
-              aria-label={`Ir a la sección ${i + 1}`} />
-          ))}
-        </div>
-        <button className="btn" onClick={() => setSlide((x) => Math.min(x + 1, SLIDES.length - 1))}
-          disabled={slide === SLIDES.length - 1}>Siguiente →</button>
-      </div>
+      {navegacion}
     </div>
   );
 }
