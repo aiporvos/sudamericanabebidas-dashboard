@@ -73,7 +73,7 @@ function Vacio() {
   return <div className="empty"><span className="icon">📭</span>Sin datos para los filtros elegidos</div>;
 }
 
-const leyenda = { wrapperStyle: { fontSize: 12, color: '#e8ecf0' } };
+const leyenda = { wrapperStyle: { fontSize: 12, color: 'var(--text)' } };
 
 // ── Los 4 gráficos ──────────────────────────────────────────────────────────
 export function Graficos({ evidencias }: { evidencias: Evidencia[] }) {

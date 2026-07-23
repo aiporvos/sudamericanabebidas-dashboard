@@ -9,14 +9,20 @@ import { DataTable } from './components/DataTable';
 import { DetalleModal } from './components/DetalleModal';
 import { ChatWidget } from './components/ChatWidget';
 import { Login } from './components/Login';
+import { SimuladorTab } from './components/SimuladorTab';
+import { PresentacionTab } from './components/PresentacionTab';
 import { cerrarSesion, estaAutenticado } from './auth';
+import { aplicarTema, obtenerTema, type Tema } from './theme';
 import { fmtDuracion, percentil } from './format';
 import logo from './assets/logo-sudamericana.png';
 
 type Fuente = 'webhook' | 'ejemplo';
+type Pestania = 'panel' | 'casos' | 'presentacion';
 
 export default function App() {
   const [autenticado, setAutenticado] = useState(estaAutenticado());
+  const [tema, setTema] = useState<Tema>(obtenerTema());
+  const [pestania, setPestania] = useState<Pestania>('panel');
   const [evidencias, setEvidencias] = useState<Evidencia[]>([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,6 +50,7 @@ export default function App() {
   };
 
   useEffect(() => { if (autenticado) void cargar(); }, [autenticado]);
+  useEffect(() => { aplicarTema(tema); }, [tema]);
 
   // ── Filtrado en memoria ──
   const filtradas = useMemo(() => {
@@ -113,6 +120,10 @@ export default function App() {
             <button className="btn" onClick={() => void cargar()} disabled={cargando}>
               {cargando ? <span className="spin">⟳</span> : '⟳'} Actualizar
             </button>
+            <button className="btn btn-ghost" title={tema === 'dark' ? 'Tema claro' : 'Tema oscuro'}
+              onClick={() => setTema((t) => (t === 'dark' ? 'light' : 'dark'))}>
+              {tema === 'dark' ? '☀️' : '🌙'}
+            </button>
             <button className="btn btn-ghost" onClick={() => { cerrarSesion(); setAutenticado(false); }}>
               Salir
             </button>
@@ -121,6 +132,21 @@ export default function App() {
       </header>
 
       <main className="container">
+        <nav className="tabs">
+          <button className={`tab${pestania === 'panel' ? ' activa' : ''}`} onClick={() => setPestania('panel')}>📊 Panel</button>
+          <button className={`tab${pestania === 'casos' ? ' activa' : ''}`} onClick={() => setPestania('casos')}>🧪 Casos de prueba</button>
+          <button className={`tab${pestania === 'presentacion' ? ' activa' : ''}`} onClick={() => setPestania('presentacion')}>🎬 Presentación</button>
+        </nav>
+
+        {/* Las tres pestañas quedan montadas (display) para no perder el estado
+            de una simulación en curso al cambiar de vista. */}
+        <div style={{ display: pestania === 'casos' ? undefined : 'none' }}>
+          <SimuladorTab />
+        </div>
+        <div style={{ display: pestania === 'presentacion' ? undefined : 'none' }}>
+          <PresentacionTab />
+        </div>
+        <div style={{ display: pestania === 'panel' ? undefined : 'none' }}>
         {error && (
           <div className="error-banner">
             <span>
@@ -159,6 +185,7 @@ export default function App() {
           Detalle por foto: resultado, confianza, coherencia lata↔tablero y textos leídos por la IA.
         </div>
         <DataTable evidencias={filtradas} onSelect={setDetalle} />
+        </div>
       </main>
 
       {detalle && <DetalleModal evidencia={detalle} onClose={() => setDetalle(null)} />}

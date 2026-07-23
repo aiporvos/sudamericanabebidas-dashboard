@@ -1,4 +1,5 @@
-/* ── Tema oscuro técnico · Sudamericana Calidad ─────────────────────────── */
+/* ── Temas · Sudamericana Calidad ───────────────────────────────────────── */
+/* Oscuro (default): "blueprint técnico". Claro: paleta crema de cluna.ar.   */
 :root {
   --bg: #0d0f14;
   --surface: #151820;
@@ -12,6 +13,46 @@
   --bad: #f87171;
   --warn: #f59e0b;
   --zebra: #161a22;
+  /* charts (Recharts lee estas vars vía palette.ts) */
+  --serie-ok: #00a98c;
+  --serie-nook: #e86363;
+  --serie-rev: #cc7d08;
+  --serie-acento: #8580e0;
+  --chart-grid: #1e2330;
+  --chart-eje: #6b7a91;
+  --chart-surface: #151820;
+  --tooltip-bg: #151820;
+  --tooltip-border: #2d3446;
+  --header-bg: rgba(13, 15, 20, 0.92);
+  --glass: rgba(21, 24, 32, 0.72);
+  --scheme: dark;
+}
+
+[data-theme='light'] {
+  --bg: #f9f4da;          /* crema cluna.ar */
+  --surface: #fffcf0;
+  --border: #e8e0c2;
+  --border-2: #d5cba4;
+  --text: #231f20;        /* tinta */
+  --text-2: #6b6355;
+  --teal: #0ba95b;        /* verde cluna */
+  --purple: #7b5ea7;
+  --ok: #0ba95b;
+  --bad: #bc0f31;
+  --warn: #cc7d08;
+  --zebra: #f4eed4;
+  --serie-ok: #0ba95b;
+  --serie-nook: #bc0f31;
+  --serie-rev: #fc7428;
+  --serie-acento: #7b5ea7;
+  --chart-grid: #e8e0c2;
+  --chart-eje: #6b6355;
+  --chart-surface: #fffcf0;
+  --tooltip-bg: #fffcf0;
+  --tooltip-border: #d5cba4;
+  --header-bg: rgba(249, 244, 218, 0.92);
+  --glass: rgba(255, 252, 240, 0.8);
+  --scheme: light;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -36,7 +77,7 @@ body {
 /* ── Cabecera fija ── */
 .header {
   position: sticky; top: 0; z-index: 50;
-  background: rgba(13, 15, 20, 0.92); backdrop-filter: blur(8px);
+  background: var(--header-bg); backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--border);
 }
 .header-inner {
@@ -79,7 +120,7 @@ body {
   outline: none; width: 100%;
 }
 .input:focus { border-color: var(--teal); }
-input[type='date'].input { color-scheme: dark; }
+input[type='date'].input { color-scheme: var(--scheme); }
 
 /* Multi-select con checkboxes */
 .multi { position: relative; }
@@ -191,7 +232,7 @@ tbody tr:hover { background: var(--border); }
 
 .login-card {
   position: relative; z-index: 1; width: 100%; max-width: 380px;
-  background: rgba(21, 24, 32, 0.72); backdrop-filter: blur(16px);
+  background: var(--glass); backdrop-filter: blur(16px);
   border: 1px solid var(--border-2); border-radius: 16px;
   padding: 36px 32px 28px; display: flex; flex-direction: column; align-items: center;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 201, 167, 0.04);
@@ -382,3 +423,71 @@ tbody tr:hover { background: var(--border); }
 }
 .chat-send-btn:hover:not(:disabled) { background: var(--teal); color: var(--bg); }
 .chat-send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ── Pestañas del panel ────────────────────────────────────────────────── */
+.tabs { display: flex; gap: 4px; margin: 14px 0 0; border-bottom: 1px solid var(--border); }
+.tab {
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer;
+  color: var(--text-2); background: none; border: none; border-bottom: 2px solid transparent;
+  padding: 9px 14px; transition: color 0.15s, border-color 0.15s;
+}
+.tab:hover { color: var(--text); }
+.tab.activa { color: var(--teal); border-bottom-color: var(--teal); }
+
+/* ── Simulador (Casos de prueba) ───────────────────────────────────────── */
+.sim-config { align-items: flex-end; }
+.sim-tandas { display: grid; grid-template-columns: 1fr; gap: 14px; margin: 16px 0; }
+@media (min-width: 900px) { .sim-tandas { grid-template-columns: 1fr 1fr; } }
+.sim-tanda-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+.sim-tanda-nombre { font-size: 12px; color: var(--text-2); }
+.sim-operario { max-width: 180px; font-size: 12px; padding: 5px 8px; }
+.sim-fotos { display: flex; gap: 10px; flex-wrap: wrap; }
+.sim-foto { position: relative; width: 108px; display: flex; flex-direction: column; gap: 4px; }
+.sim-foto img {
+  width: 108px; height: 108px; object-fit: cover; border-radius: 8px;
+  border: 1px solid var(--border-2); background: var(--bg);
+}
+.sim-foto .badge { align-self: flex-start; }
+.sim-foto-detalle { font-size: 9.5px; color: var(--text-2); line-height: 1.25; word-break: break-word; }
+.sim-log { font-size: 11.5px; max-height: 260px; overflow-y: auto; line-height: 1.7; }
+
+/* ── Presentación del demo ─────────────────────────────────────────────── */
+.pres { max-width: 900px; margin: 0 auto; }
+.pres-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin: 18px 0 12px; }
+.pres-slide { position: relative; padding: 26px 28px 22px; min-height: 380px; }
+.pres-num {
+  position: absolute; top: 14px; right: 18px; font-size: 34px; font-weight: 700;
+  color: var(--border-2); user-select: none;
+}
+.pres-titulo { font-size: 21px; font-weight: 700; margin-bottom: 14px; color: var(--teal); }
+.pres-cuerpo { font-size: 14px; line-height: 1.65; display: flex; flex-direction: column; gap: 12px; }
+.pres-cuerpo p { margin: 0; }
+.pres-pasos { margin: 0 0 0 20px; display: flex; flex-direction: column; gap: 8px; }
+.pres-beneficio {
+  margin-top: 4px; padding: 10px 14px; border-radius: 8px; font-size: 13px;
+  background: color-mix(in srgb, var(--teal) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--teal) 30%, transparent);
+  color: var(--text);
+}
+.pres-flujo { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 4px; }
+.pres-flujo-item { display: inline-flex; align-items: center; gap: 4px; }
+.pres-flujo-caja {
+  background: var(--bg); border: 1px solid var(--border-2); border-radius: 8px;
+  padding: 7px 11px; font-size: 12px; white-space: nowrap;
+}
+.pres-flujo-flecha { color: var(--teal); font-weight: 700; padding: 0 2px; }
+.pres-tabla { width: 100%; border-collapse: collapse; font-size: 13px; }
+.pres-tabla th { text-align: left; font-size: 11px; }
+.pres-tabla td { font-size: 12.5px; }
+.pres-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 14px 0 30px; }
+.pres-dots { display: flex; gap: 7px; }
+.pres-dot {
+  width: 9px; height: 9px; border-radius: 50%; border: none; cursor: pointer;
+  background: var(--border-2); padding: 0; transition: background 0.15s, transform 0.15s;
+}
+.pres-dot:hover { transform: scale(1.25); }
+.pres-dot.activa { background: var(--teal); }
+
+/* Ajustes del tema claro para superficies con rgba fijos del chat */
+[data-theme='light'] .chat-msg-assistant { background: rgba(0, 0, 0, 0.04); }
+[data-theme='light'] .modal-back { background: rgba(60, 52, 30, 0.45); }
