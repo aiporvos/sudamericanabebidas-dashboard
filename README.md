@@ -89,7 +89,7 @@ git subtree push --prefix=apps/dashboard dashboard main
 1. En el proyecto **Sudamericana** → *Create Service* → **Application**.
 2. Source: GitHub → repo **`sudamericanabebidas-dashboard`**, branch `main`, Build Path `/`, Trigger `On Push`.
 3. Build type: **Dockerfile**, *Docker File*: `Dockerfile` (está en la raíz del repo de deploy).
-4. En *Domains* agregá el dominio (actual: `dashboard.cluna.ar`), puerto **80**, HTTPS con Let's Encrypt.
+4. En *Domains* agregá el dominio (actual: `sudamericana.opendraft.tech`), puerto **80**, HTTPS con Let's Encrypt.
 5. Deploy. Cada `git subtree push` redeploya automáticamente (o botón Deploy manual si el
    provider de GitHub no dispara solo — ver historial del proyecto).
 
@@ -98,7 +98,7 @@ git subtree push --prefix=apps/dashboard dashboard main
 El navegador solo puede leer el webhook si n8n responde con
 `Access-Control-Allow-Origin` que incluya el dominio del dashboard. En el nodo
 **Webhook** de WF6, en *Options → Allowed Origins (CORS)*, está fijado a
-`https://dashboard.cluna.ar` (cerrado, no `*`). Si cambia el dominio, actualizar ahí
+`https://sudamericana.opendraft.tech` (cerrado, no `*`). Si cambia el dominio, actualizar ahí
 y en el nodo "Responder JSON". Sin esto, el dashboard queda en «datos de ejemplo» con el banner rojo.
 
 Checklist rápido si no carga:
