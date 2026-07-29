@@ -534,3 +534,32 @@ tbody tr:hover { background: color-mix(in srgb, var(--primary) 18%, var(--surfac
   .pres-full { padding: 12px 14px; }
   .pres-full-slide { justify-content: flex-start; }
 }
+
+/* ── Criterios de aceptación ───────────────────────────────────────────── */
+.crit-resumen { align-items: center; gap: 22px; }
+.crit-kpi { display: flex; flex-direction: column; line-height: 1.15; }
+.crit-kpi b { font-family: 'Paytone One', sans-serif; font-weight: 400; font-size: 22px; }
+.crit-kpi span { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-2); }
+.crit-grupo { margin: 22px 0; }
+.crit-grupo-titulo {
+  font-family: 'Paytone One', sans-serif; font-size: 15px; margin-bottom: 10px;
+  border-bottom: 2px solid var(--fg); padding-bottom: 5px;
+}
+.crit-item { margin-bottom: 10px; padding: 12px 14px; }
+.crit-item-head {
+  width: 100%; background: none; border: none; cursor: pointer; padding: 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  color: var(--text); text-align: left; flex-wrap: wrap;
+}
+.crit-item-nombre { font-weight: 700; font-size: 14px; }
+.crit-desc { font-size: 12.5px; font-weight: 500; color: var(--text-2); margin: 8px 0 0; }
+.crit-ficha { margin-top: 12px; }
+.crit-hoy {
+  font-size: 12.5px; font-weight: 500; padding: 10px 12px; border-radius: 0.5rem;
+  background: var(--zebra); border: 2px solid var(--fg); margin-bottom: 12px;
+}
+.crit-campos { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 780px) { .crit-campos { grid-template-columns: 1fr 1fr; } }
+.crit-textarea { resize: vertical; font-family: 'Outfit', sans-serif; }
+.crit-estado-row { display: flex; align-items: center; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+.crit-estado-activo { background: var(--primary); color: var(--tinta); }
