@@ -12,13 +12,14 @@ import { Login } from './components/Login';
 import { SimuladorTab } from './components/SimuladorTab';
 import { PresentacionTab } from './components/PresentacionTab';
 import { CriteriosTab } from './components/CriteriosTab';
+import { TelegramTab } from './components/TelegramTab';
 import { cerrarSesion, estaAutenticado } from './auth';
 import { aplicarTema, obtenerTema, type Tema } from './theme';
 import { fmtDuracion, percentil } from './format';
 import logo from './assets/logo-sudamericana.png';
 
 type Fuente = 'webhook' | 'ejemplo';
-type Pestania = 'panel' | 'casos' | 'presentacion' | 'criterios';
+type Pestania = 'panel' | 'casos' | 'presentacion' | 'criterios' | 'telegram';
 
 export default function App() {
   const [autenticado, setAutenticado] = useState(estaAutenticado());
@@ -138,6 +139,7 @@ export default function App() {
           <button className={`tab${pestania === 'casos' ? ' activa' : ''}`} onClick={() => setPestania('casos')}>🧪 Casos de prueba</button>
           <button className={`tab${pestania === 'presentacion' ? ' activa' : ''}`} onClick={() => setPestania('presentacion')}>🎬 Presentación</button>
           <button className={`tab${pestania === 'criterios' ? ' activa' : ''}`} onClick={() => setPestania('criterios')}>📋 Criterios</button>
+          <button className={`tab${pestania === 'telegram' ? ' activa' : ''}`} onClick={() => setPestania('telegram')}>✈️ Telegram</button>
         </nav>
 
         {/* Las tres pestañas quedan montadas (display) para no perder el estado
@@ -150,6 +152,9 @@ export default function App() {
         </div>
         <div style={{ display: pestania === 'criterios' ? undefined : 'none' }}>
           <CriteriosTab />
+        </div>
+        <div style={{ display: pestania === 'telegram' ? undefined : 'none' }}>
+          <TelegramTab />
         </div>
         <div style={{ display: pestania === 'panel' ? undefined : 'none' }}>
         {error && (
