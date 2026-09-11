@@ -3,6 +3,7 @@ import type { Evidencia } from '../types';
 import { cargarRevisor, guardarRevisor, imagenUrl, type Revisor } from '../api';
 import { MOTIVOS_RECHAZO, type Accion } from '../revision';
 import { esTablero, tableroDe, verificar } from '../verificacion';
+import { Lupa } from './Lupa';
 
 /**
  * Bandeja de Revisión — el corazón del Centro de Control.
@@ -88,6 +89,8 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [revisor, setRevisor] = useState<Revisor>(() => cargarRevisor());
   const [editandoRevisor, setEditandoRevisor] = useState(false);
+  // Qué foto está abierta en la lupa: la de la lata o la del tablero.
+  const [ampliada, setAmpliada] = useState<null | 'lata' | 'tablero'>(null);
   const zonaRef = useRef<HTMLDivElement>(null);
 
   const cola = useMemo(
@@ -225,6 +228,16 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
         </div>
       )}
 
+      {ampliada && (
+        <Lupa
+          src={imagenUrl(ampliada === 'lata' ? actual.evidenceId : tablero!.evidenceId)}
+          titulo={ampliada === 'lata'
+            ? `Lata · ${actual.linea} · ${actual.fecha.toLocaleString('es-AR')}`
+            : `Tablero de la tanda · ${tablero!.fecha.toLocaleString('es-AR')}`}
+          onCerrar={() => setAmpliada(null)}
+        />
+      )}
+
       <div className="bandeja-grid">
         <div className="bandeja-fotos">
           <figure className="bandeja-foto">
@@ -243,6 +256,8 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
                 src={imagenUrl(actual.evidenceId)}
                 alt={`Evidencia ${actual.evidenceId}`}
                 onError={() => setFotoRota(true)}
+                onClick={() => setAmpliada('lata')}
+                title="Clic para ampliar"
               />
             )}
             <figcaption>
@@ -259,7 +274,12 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
           {!esTablero(actual) && (
             tablero ? (
               <figure className="bandeja-foto bandeja-foto-ref">
-                <img src={imagenUrl(tablero.evidenceId)} alt="Tablero de la tanda" />
+                <img
+                  src={imagenUrl(tablero.evidenceId)}
+                  alt="Tablero de la tanda"
+                  onClick={() => setAmpliada('tablero')}
+                  title="Clic para ampliar"
+                />
                 <figcaption>
                   <b>Tablero de la tanda</b> · {tablero.fecha.toLocaleTimeString('es-AR')}
                   {' · '}{Math.round(Math.abs(tablero.fecha.getTime() - actual.fecha.getTime()) / 60000)} min de diferencia

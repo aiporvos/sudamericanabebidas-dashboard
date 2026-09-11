@@ -112,13 +112,27 @@ export async function guardarRevision(
     }),
   });
 
-  // WF11 responde 401 con un motivo legible (token invalido / usuario no
-  // reconocido / rechazo sin motivo). Se muestra tal cual: decirle "error 401"
-  // a un operario no le sirve para arreglar nada.
-  const cuerpo = await res.json().catch(() => ({}));
-  if (!res.ok || !cuerpo?.ok) {
-    throw new Error(cuerpo?.error || `El servidor respondió ${res.status}.`);
+  // WF11 responde con un motivo legible (usuario o clave incorrectos, rechazo
+  // sin motivo…). Se muestra tal cual: decirle "error 401" a un revisor no le
+  // sirve para arreglar nada.
+  const texto = await res.text();
+  let cuerpo: { ok?: boolean; error?: string } = {};
+  try { cuerpo = texto ? JSON.parse(texto) : {}; } catch { /* no era JSON */ }
+
+  if (cuerpo.ok) return;
+
+  if (cuerpo.error) throw new Error(cuerpo.error);
+
+  // Un 200 con el cuerpo vacío significa que el workflow se cayó a mitad de
+  // camino y n8n respondió igual. Decir "el servidor respondió 200" es peor que
+  // no decir nada: suena a éxito y manda a buscar el problema donde no está.
+  if (!texto.trim()) {
+    throw new Error(
+      'El servidor aceptó el pedido pero no devolvió respuesta. Suele ser que falta '
+      + 'una migración en la base. La decisión NO se guardó: avisá al administrador.',
+    );
   }
+  throw new Error(`Respuesta inesperada del servidor (${res.status}).`);
 }
 
 export const FALLBACK: RawEvidencia[] = [
