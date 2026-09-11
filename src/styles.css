@@ -837,3 +837,11 @@ tbody tr:hover { background: color-mix(in srgb, var(--primary) 18%, var(--surfac
 }
 .bandeja-ia summary { cursor: pointer; color: var(--muted); font-size: 12.5px; }
 .bandeja-ia[open] summary { margin-bottom: 9px; }
+
+/* El lote que el sistema leyó en el tablero, para poder comprobarlo contra la foto. */
+.bandeja-ref-lote {
+  margin-top: 7px; padding-top: 7px; border-top: 1px solid var(--border);
+  font-size: 14px; color: var(--text);
+}
+.bandeja-ref-lote b { font-size: 18px; font-variant-numeric: tabular-nums; }
+.bandeja-ref-nota { display: block; font-size: 11.5px; color: var(--muted); }

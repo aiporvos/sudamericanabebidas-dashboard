@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Evidencia } from '../types';
 import { cargarRevisor, guardarRevisor, imagenUrl, type Revisor } from '../api';
 import { MOTIVOS_RECHAZO, type Accion } from '../revision';
-import { esTablero, tableroDe, verificar } from '../verificacion';
+import { esTablero, loteDeEvidencia, tableroDe, verificar } from '../verificacion';
 import { Lupa } from './Lupa';
 import { HistorialRevisiones } from './HistorialRevisiones';
 
@@ -70,13 +70,6 @@ function prioridad(e: Evidencia): number {
  */
 function pendiente(e: Evidencia): boolean {
   return e.estadoResultado === 'revision_manual' || e.estadoResultado === 'pendiente_revision';
-}
-
-function Confianza({ valor }: { valor: number | null }) {
-  if (valor === null) return <span className="chip">sin confianza</span>;
-  const pct = Math.round(valor * 100);
-  const nivel = valor >= 0.85 ? 'ok' : valor >= 0.5 ? 'warn' : 'bad';
-  return <span className={`bandeja-conf bandeja-conf-${nivel}`}>{pct}% de confianza</span>;
 }
 
 export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
@@ -303,6 +296,15 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
                 <figcaption>
                   <b>Tablero de la tanda</b> · {tablero.fecha.toLocaleTimeString('es-AR')}
                   {' · '}{Math.round(Math.abs(tablero.fecha.getTime() - actual.fecha.getTime()) / 60000)} min de diferencia
+                  {/* El lote del tablero SÍ se lee bien (100% medido). Se muestra para
+                      que se pueda comprobar de un vistazo contra la foto, en vez de
+                      confiar a ciegas en que el sistema lo leyó bien. */}
+                  {loteDeEvidencia(tablero) && (
+                    <div className="bandeja-ref-lote">
+                      Lote del tablero: <b>{loteDeEvidencia(tablero)}</b>
+                      <span className="bandeja-ref-nota">comprobalo en la foto</span>
+                    </div>
+                  )}
                 </figcaption>
               </figure>
             ) : (
@@ -318,10 +320,12 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
         </div>
 
         <div className="bandeja-datos">
-          <div className="bandeja-cab">
-            <span className="bandeja-tipo">{actual.tipoFoto ?? 'sin clasificar'}</span>
-            <Confianza valor={actual.confianza} />
-          </div>
+          {/* Acá NO va nada de la IA.
+              En el fondo de la lata no lee: 8-20% medido. Mostrar su lectura, o su
+              porcentaje de confianza, es ocupar la pantalla con un dato que no sirve
+              para decidir y que encima contamina la lectura de la persona.
+              Lo único que aporta el sistema en esta pantalla es el CALENDARIO —
+              qué lote corresponde ese día— y eso es aritmética, no OCR. */}
 
           {/* LO QUE LEE LA PERSONA. Es el dato con el que se decide.
 
@@ -377,21 +381,6 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
             </div>
           )}
 
-          {/* Lo que leyó la IA queda disponible pero PLEGADO. No se borra porque
-              sirve para diagnosticar por qué falló una lectura; se esconde porque
-              mostrarlo de entrada contamina la del revisor. */}
-          {actual.textos.length > 0 && (
-            <details className="bandeja-ia">
-              <summary>Ver lo que leyó la IA (no es confiable en el fondo de la lata)</summary>
-              <dl className="bandeja-dl">
-                <dt>Texto leído</dt>
-                <dd className="bandeja-mono">{actual.textos.join(' · ')}</dd>
-                {actual.calidadImpresion && (<><dt>Impresión</dt><dd>{actual.calidadImpresion}</dd></>)}
-                {actual.defectos.length > 0 && (<><dt>Defectos</dt><dd>{actual.defectos.join(', ')}</dd></>)}
-                {actual.motivo && (<><dt>Motivo</dt><dd className="bandeja-mono">{actual.motivo}</dd></>)}
-              </dl>
-            </details>
-          )}
 
           <label className="bandeja-campo">
             <span>Comentario (opcional)</span>
