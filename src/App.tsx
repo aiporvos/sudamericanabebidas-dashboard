@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FALLBACK, fetchEvidencias, normalizar } from './api';
+import { FALLBACK, fetchEvidencias, guardarRevision, normalizar } from './api';
 import type { Evidencia } from './types';
 import { fmtFechaHora, fmtInt, fmtPct, fmtUsd, tipoFotoLabel } from './format';
 import { FiltersBar, FILTROS_VACIOS, type Filtros } from './components/FiltersBar';
@@ -58,9 +58,13 @@ export default function App() {
   // Cuánto hay esperando a una persona. Va en la pestaña, no adentro, para que se
   // vea sin entrar: una cola que crece sin que nadie la mire es el riesgo principal
   // del modelo de verificación manual.
+  //
+  // Mismo criterio que la cola de la Bandeja: manda el ESTADO, no `revisado_por`.
+  // Una evidencia "observada" ya tiene revisor cargado pero sigue pendiente, así que
+  // contar por revisor dejaría el badge por debajo de la cola real.
   const pendientesRevision = useMemo(
     () => evidencias.filter(
-      (e) => !e.revisadoPor && (e.revisionManual || e.estadoResultado === 'revision_manual'),
+      (e) => e.estadoResultado === 'revision_manual' || e.estadoResultado === 'pendiente_revision',
     ).length,
     [evidencias],
   );
@@ -159,7 +163,16 @@ export default function App() {
         {/* Las tres pestañas quedan montadas (display) para no perder el estado
             de una simulación en curso al cambiar de vista. */}
         <div style={{ display: pestania === 'bandeja' ? undefined : 'none' }}>
-          <BandejaTab evidencias={evidencias} activa={pestania === 'bandeja'} />
+          {/* Tras guardar se recarga: el estado de la evidencia cambió en la base y la
+              cola tiene que reflejarlo, sobre todo con varios revisores a la vez. */}
+          <BandejaTab
+            evidencias={evidencias}
+            activa={pestania === 'bandeja'}
+            onResolver={async (id, accion, motivo, comentario) => {
+              await guardarRevision(id, accion, motivo, comentario);
+              void cargar();
+            }}
+          />
         </div>
         <div style={{ display: pestania === 'casos' ? undefined : 'none' }}>
           <SimuladorTab />

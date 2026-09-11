@@ -66,6 +66,61 @@ export async function fetchEvidencias(): Promise<Evidencia[]> {
 
 // ── Datos de ejemplo (fallback si el webhook falla) ─────────────────────────
 // Basados en las pruebas reales del piloto (líneas y casos verídicos).
+// ── Guardar una revisión humana (WF11) ────────────────────────────────────
+// La credencial NO viaja en el código: se carga una vez por navegador, igual que
+// en la pestaña «Casos de prueba». Así el mismo build sirve para cualquier
+// instancia y el bundle no contiene nada sensible.
+export const REVISION_URL: string =
+  (import.meta as any).env?.VITE_REVISION_URL ??
+  WEBHOOK_URL.replace(/\/webhook\/.*$/, '/webhook/revision');
+
+const CLAVE_REVISOR = 'sudamericana_revisor';
+
+export interface Revisor { usuario: string; clave: string; }
+
+export function cargarRevisor(): Revisor {
+  try {
+    const r = JSON.parse(localStorage.getItem(CLAVE_REVISOR) || '{}');
+    return { usuario: String(r.usuario || ''), clave: String(r.clave || '') };
+  } catch {
+    return { usuario: '', clave: '' };
+  }
+}
+
+export function guardarRevisor(r: Revisor): void {
+  try { localStorage.setItem(CLAVE_REVISOR, JSON.stringify(r)); } catch { /* modo privado */ }
+}
+
+export async function guardarRevision(
+  evidenceId: string, accion: string, motivo: string, comentario: string,
+): Promise<void> {
+  const revisor = cargarRevisor();
+  if (!revisor.usuario || !revisor.clave) {
+    throw new Error('Falta configurar quién revisa. Abrí «Quién revisa» arriba.');
+  }
+
+  const res = await fetch(REVISION_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      token: revisor.clave,
+      usuario: revisor.usuario,
+      evidence_id: evidenceId,
+      accion,
+      motivo,
+      comentario,
+    }),
+  });
+
+  // WF11 responde 401 con un motivo legible (token invalido / usuario no
+  // reconocido / rechazo sin motivo). Se muestra tal cual: decirle "error 401"
+  // a un operario no le sirve para arreglar nada.
+  const cuerpo = await res.json().catch(() => ({}));
+  if (!res.ok || !cuerpo?.ok) {
+    throw new Error(cuerpo?.error || `El servidor respondió ${res.status}.`);
+  }
+}
+
 export const FALLBACK: RawEvidencia[] = [
   { evidence_id: 'calidad-lata:-1003908341093:21', linea: 'linea-2', equipo: 'etiquetadora', capturado_en: '2026-07-11T16:40:55Z', estado_ingesta: 'recibido', tipo_foto: 'pantalla_contador', estado_resultado: 'procesado', resultado: 'OK', confianza: 0.95, revision_manual: false, calidad_impresion: null, coherencia: null, motivo: null, defectos: [], textos: ['LINEA 2 - ETIQUETADORA', 'CONTADOR: 0045230', 'LOTE: 119', 'HORA: 14:02'], hora_pantalla: '14:02 24/12/26', tokens: 906, revisado_por: null },
   { evidence_id: 'calidad-lata:-1003908341093:20', linea: 'linea-2', equipo: 'etiquetadora', capturado_en: '2026-07-11T16:41:10Z', estado_ingesta: 'recibido', tipo_foto: 'fondo_impresion', estado_resultado: 'procesado', resultado: 'OK', confianza: 0.95, revision_manual: false, calidad_impresion: 'buena', coherencia: true, motivo: null, defectos: [], textos: ['L:119 14:02', 'V:24/12/26'], hora_pantalla: null, tokens: 645, revisado_por: null },

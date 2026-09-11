@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Evidencia } from '../types';
-import { imagenUrl } from '../api';
+import { cargarRevisor, guardarRevisor, imagenUrl, type Revisor } from '../api';
 import { MOTIVOS_RECHAZO, type Accion } from '../revision';
 
 /**
@@ -54,9 +54,19 @@ function prioridad(e: Evidencia): number {
   return p;
 }
 
+/**
+ * Qué sigue esperando a una persona.
+ *
+ * Se decide por ESTADO, no por `revisado_por`. Filtrar por "alguien ya la tocó"
+ * rompía el caso `observada`: esa acción significa "la miré y no puedo decidir,
+ * que la vea otro", así que deja `estado = revision_manual` a propósito — pero
+ * también deja `revisado_por` cargado, y con el filtro viejo la evidencia
+ * desaparecía de la cola justo cuando más falta hacía que alguien la resolviera.
+ *
+ * Los estados terminales ('revisado', 'rechazado') son los que la sacan.
+ */
 function pendiente(e: Evidencia): boolean {
-  if (e.revisadoPor) return false;
-  return e.revisionManual || e.estadoResultado === 'revision_manual' || e.estadoResultado === 'pendiente_revision';
+  return e.estadoResultado === 'revision_manual' || e.estadoResultado === 'pendiente_revision';
 }
 
 function Confianza({ valor }: { valor: number | null }) {
@@ -75,6 +85,8 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
   const [guardando, setGuardando] = useState(false);
   const [fotoRota, setFotoRota] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [revisor, setRevisor] = useState<Revisor>(() => cargarRevisor());
+  const [editandoRevisor, setEditandoRevisor] = useState(false);
   const zonaRef = useRef<HTMLDivElement>(null);
 
   const cola = useMemo(
@@ -155,7 +167,51 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
         <div className="bandeja-atajos">
           <kbd>A</kbd> aprobar <kbd>R</kbd> rechazar <kbd>O</kbd> observar <kbd>←</kbd><kbd>→</kbd> navegar
         </div>
+        <button className="btn btn-ghost" onClick={() => setEditandoRevisor((v) => !v)}>
+          {revisor.usuario ? `👤 ${revisor.usuario}` : '⚠ Quién revisa'}
+        </button>
       </div>
+
+      {editandoRevisor && (
+        <div className="bandeja-revisor">
+          <div className="bandeja-sug-et">Quién está revisando</div>
+          <p className="ayuda-revisor">
+            Queda registrado en cada decisión. Se guarda en este navegador: no viaja en la
+            aplicación, así que el mismo panel sirve para cualquier revisor.
+          </p>
+          <div className="bandeja-revisor-campos">
+            <label>
+              <span>Usuario</span>
+              <input
+                id="revisor-usuario"
+                className="input"
+                autoComplete="off"
+                value={revisor.usuario}
+                onChange={(ev) => setRevisor({ ...revisor, usuario: ev.target.value.trim() })}
+                placeholder="tu usuario"
+              />
+            </label>
+            <label>
+              <span>Clave del panel</span>
+              <input
+                id="revisor-clave"
+                className="input"
+                type="password"
+                autoComplete="off"
+                value={revisor.clave}
+                onChange={(ev) => setRevisor({ ...revisor, clave: ev.target.value.trim() })}
+                placeholder="pedila al administrador"
+              />
+            </label>
+          </div>
+          <button
+            className="btn"
+            onClick={() => { guardarRevisor(revisor); setEditandoRevisor(false); }}
+          >
+            Guardar
+          </button>
+        </div>
+      )}
 
       <div className="bandeja-grid">
         <figure className="bandeja-foto">
@@ -242,10 +298,10 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
 
           {error && <div className="bandeja-error">{error}</div>}
 
-          {!onResolver && (
+          {!revisor.usuario && (
             <div className="bandeja-aviso">
-              Modo vista previa: las decisiones se marcan en pantalla pero todavía no se
-              guardan en la base. Falta publicar el flujo de guardado.
+              Cargá <b>quién revisa</b> antes de decidir: cada aprobación queda a nombre de
+              una persona, y sin eso el servidor la rechaza.
             </div>
           )}
 

@@ -701,3 +701,13 @@ tbody tr:hover { background: color-mix(in srgb, var(--primary) 18%, var(--surfac
 .bandeja-foto-rota-icono { font-size: 40px; line-height: 1; }
 .bandeja-foto-rota p { margin: 0; max-width: 34em; font-size: 14px; }
 .bandeja-foto-rota code { font-size: 12px; opacity: .8; word-break: break-all; }
+
+.bandeja-revisor {
+  border: 2px solid var(--fg); border-radius: 0.5rem; padding: 14px 16px;
+  background: var(--surface); box-shadow: 3px 3px 0 var(--fg);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.ayuda-revisor { font-size: 13px; color: var(--muted); margin: 0; max-width: 60ch; }
+.bandeja-revisor-campos { display: flex; flex-wrap: wrap; gap: 12px; }
+.bandeja-revisor-campos label { display: flex; flex-direction: column; gap: 4px; flex: 1 1 200px; font-size: 12px; color: var(--muted); }
+.bandeja-revisor .btn { align-self: flex-start; }
