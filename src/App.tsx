@@ -13,13 +13,14 @@ import { SimuladorTab } from './components/SimuladorTab';
 import { PresentacionTab } from './components/PresentacionTab';
 import { CriteriosTab } from './components/CriteriosTab';
 import { TelegramTab } from './components/TelegramTab';
+import { BandejaTab } from './components/BandejaTab';
 import { cerrarSesion, estaAutenticado } from './auth';
 import { aplicarTema, obtenerTema, type Tema } from './theme';
 import { fmtDuracion, percentil } from './format';
 import logo from './assets/logo-sudamericana.png';
 
 type Fuente = 'webhook' | 'ejemplo';
-type Pestania = 'panel' | 'casos' | 'presentacion' | 'criterios' | 'telegram';
+type Pestania = 'panel' | 'bandeja' | 'casos' | 'presentacion' | 'criterios' | 'telegram';
 
 export default function App() {
   const [autenticado, setAutenticado] = useState(estaAutenticado());
@@ -53,6 +54,16 @@ export default function App() {
 
   useEffect(() => { if (autenticado) void cargar(); }, [autenticado]);
   useEffect(() => { aplicarTema(tema); }, [tema]);
+
+  // Cuánto hay esperando a una persona. Va en la pestaña, no adentro, para que se
+  // vea sin entrar: una cola que crece sin que nadie la mire es el riesgo principal
+  // del modelo de verificación manual.
+  const pendientesRevision = useMemo(
+    () => evidencias.filter(
+      (e) => !e.revisadoPor && (e.revisionManual || e.estadoResultado === 'revision_manual'),
+    ).length,
+    [evidencias],
+  );
 
   // ── Filtrado en memoria ──
   const filtradas = useMemo(() => {
@@ -136,6 +147,9 @@ export default function App() {
       <main className="container">
         <nav className="tabs">
           <button className={`tab${pestania === 'panel' ? ' activa' : ''}`} onClick={() => setPestania('panel')}>📊 Panel</button>
+          <button className={`tab${pestania === 'bandeja' ? ' activa' : ''}`} onClick={() => setPestania('bandeja')}>
+            ✅ Revisión{pendientesRevision > 0 && <span className="tab-badge">{pendientesRevision}</span>}
+          </button>
           <button className={`tab${pestania === 'casos' ? ' activa' : ''}`} onClick={() => setPestania('casos')}>🧪 Casos de prueba</button>
           <button className={`tab${pestania === 'presentacion' ? ' activa' : ''}`} onClick={() => setPestania('presentacion')}>🎬 Presentación</button>
           <button className={`tab${pestania === 'criterios' ? ' activa' : ''}`} onClick={() => setPestania('criterios')}>📋 Criterios</button>
@@ -144,6 +158,9 @@ export default function App() {
 
         {/* Las tres pestañas quedan montadas (display) para no perder el estado
             de una simulación en curso al cambiar de vista. */}
+        <div style={{ display: pestania === 'bandeja' ? undefined : 'none' }}>
+          <BandejaTab evidencias={evidencias} activa={pestania === 'bandeja'} />
+        </div>
         <div style={{ display: pestania === 'casos' ? undefined : 'none' }}>
           <SimuladorTab />
         </div>

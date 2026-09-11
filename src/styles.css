@@ -606,3 +606,98 @@ tbody tr:hover { background: color-mix(in srgb, var(--primary) 18%, var(--surfac
 .tg-faq { margin-bottom: 22px; }
 .tg-faq p { font-size: 13.5px; font-weight: 500; line-height: 1.6; margin-bottom: 10px; }
 .tg-faq p:last-child { margin-bottom: 0; }
+
+/* ── Bandeja de Revisión ───────────────────────────────────────────────
+   Pensada para velocidad: foto grande a la izquierda, datos y acciones a la
+   derecha, y todo alcanzable con el teclado. Con más de 1.000 fotos por día,
+   cada clic de más se multiplica por mil. */
+.bandeja { display: flex; flex-direction: column; gap: 14px; }
+.bandeja-barra {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  border: 2px solid var(--fg); border-radius: 0.5rem; padding: 10px 14px;
+  background: var(--surface); box-shadow: 3px 3px 0 var(--fg);
+}
+.bandeja-progreso { font-size: 15px; }
+.bandeja-progreso b { font-size: 20px; font-variant-numeric: tabular-nums; }
+.bandeja-hechas { color: var(--muted); }
+.bandeja-atajos { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.bandeja kbd {
+  display: inline-block; border: 1.5px solid var(--fg); border-radius: 4px;
+  padding: 0 5px; font-size: 11px; font-weight: 700; font-family: inherit;
+  background: var(--bg); box-shadow: 1.5px 1.5px 0 var(--fg); line-height: 1.5;
+}
+
+.bandeja-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.bandeja-foto { margin: 0; border: 2px solid var(--fg); border-radius: 0.5rem; overflow: hidden; background: var(--surface); box-shadow: 4px 4px 0 var(--fg); }
+.bandeja-foto img { display: block; width: 100%; max-height: 62vh; object-fit: contain; background: #000; }
+.bandeja-foto figcaption { padding: 9px 12px; font-size: 12.5px; color: var(--muted); border-top: 2px solid var(--fg); }
+
+.bandeja-datos { display: flex; flex-direction: column; gap: 12px; }
+.bandeja-cab { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+.bandeja-tipo {
+  border: 2px solid var(--fg); border-radius: 999px; padding: 3px 12px;
+  font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+  background: var(--primary); color: var(--tinta);
+}
+.bandeja-conf { border: 2px solid currentColor; border-radius: 999px; padding: 3px 11px; font-size: 12px; font-weight: 700; }
+.bandeja-conf-ok { color: var(--ok); }
+.bandeja-conf-warn { color: var(--warn); }
+.bandeja-conf-bad { color: var(--bad); }
+
+.bandeja-sugerencia, .bandeja-motivos {
+  border: 2px solid var(--fg); border-radius: 0.5rem; padding: 13px 15px;
+  background: var(--surface); box-shadow: 3px 3px 0 var(--fg);
+}
+.bandeja-sug-et { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 9px; }
+.bandeja-dl { display: grid; grid-template-columns: auto 1fr; gap: 5px 14px; margin: 0; font-size: 14px; }
+.bandeja-dl dt { color: var(--muted); }
+.bandeja-dl dd { margin: 0; font-weight: 600; }
+.bandeja-mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12.5px; word-break: break-word; }
+
+.bandeja-campo { display: flex; flex-direction: column; gap: 5px; font-size: 13px; color: var(--muted); }
+.bandeja-campo textarea {
+  font-family: inherit; font-size: 14px; padding: 9px 11px; resize: vertical;
+  border: 2px solid var(--fg); border-radius: 0.5rem; background: var(--surface); color: var(--fg);
+}
+.bandeja-motivos-lista { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 9px; }
+.bandeja-motivos-lista .btn { font-size: 13px; padding: 7px 12px; }
+.bandeja-motivos-lista .btn.activa { background: var(--bad); color: #fff; }
+
+.bandeja-acciones { display: flex; flex-wrap: wrap; gap: 9px; }
+.bandeja-acciones .btn { flex: 1 1 auto; min-height: 50px; font-size: 15px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
+.bandeja-aprobar { background: var(--ok); color: #fff; border-color: var(--fg); }
+.bandeja-rechazar { background: var(--bad); color: #fff; border-color: var(--fg); }
+.bandeja-aprobar kbd, .bandeja-rechazar kbd { background: rgba(255,255,255,.22); border-color: currentColor; box-shadow: none; color: inherit; }
+
+.bandeja-error, .bandeja-aviso {
+  border: 2px solid var(--fg); border-radius: 0.5rem; padding: 10px 13px; font-size: 13.5px;
+}
+.bandeja-error { background: var(--bad); color: #fff; }
+.bandeja-aviso { background: var(--primary); color: var(--tinta); }
+
+.bandeja-vacia { text-align: center; padding: 60px 20px; }
+.bandeja-vacia-emoji { font-size: 56px; line-height: 1; color: var(--ok); }
+.bandeja-vacia h2 { margin: 14px 0 6px; }
+.bandeja-vacia p { color: var(--muted); margin: 0; }
+
+@media (max-width: 860px) {
+  .bandeja-grid { grid-template-columns: 1fr; }
+  .bandeja-foto img { max-height: 46vh; }
+  .bandeja-atajos { display: none; }  /* en táctil no hay teclado que mostrar */
+}
+
+/* Contador de pendientes sobre la pestaña de Revisión. */
+.tab-badge {
+  display: inline-block; margin-left: 7px; min-width: 20px; padding: 0 6px;
+  border: 2px solid var(--fg); border-radius: 999px; background: var(--warn); color: var(--tinta);
+  font-size: 11px; font-weight: 900; line-height: 17px; font-variant-numeric: tabular-nums;
+}
+
+.bandeja-foto-rota {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; min-height: 320px; padding: 28px 22px; text-align: center;
+  background: var(--bad); color: #fff;
+}
+.bandeja-foto-rota-icono { font-size: 40px; line-height: 1; }
+.bandeja-foto-rota p { margin: 0; max-width: 34em; font-size: 14px; }
+.bandeja-foto-rota code { font-size: 12px; opacity: .8; word-break: break-all; }
