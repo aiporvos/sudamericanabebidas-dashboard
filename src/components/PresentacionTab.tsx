@@ -171,6 +171,66 @@ const SLIDES: { emoji: string; titulo: string; cuerpo: React.ReactNode }[] = [
     ),
   },
   {
+    emoji: '🔬',
+    titulo: 'Qué probamos para leer el código de la lata',
+    cuerpo: (
+      <>
+        <p>
+          El control automático del <b>código impreso en el fondo de la lata</b> es la única parte que
+          no dio resultado. No se abandonó por corazonada: se midió, con fotos reales de planta.
+        </p>
+        <table className="pres-tabla">
+          <thead>
+            <tr><th>Motor de lectura</th><th>Pantalla del codificador</th><th>Fondo de la lata</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>El modelo de IA que usamos hoy</td><td>—</td><td>0 de 6</td></tr>
+            <tr><td>PaddleOCR (motor dedicado, propio)</td><td>100%</td><td>17–20%</td></tr>
+            <tr><td>Google Cloud Vision</td><td>100%</td><td>5%</td></tr>
+            <tr><td><b>Medición sobre producción</b> (12 fotos)</td><td>—</td><td><b>1 de 12 · 8%</b></td></tr>
+          </tbody>
+        </table>
+        <p>
+          Además probamos <b>mejorar la imagen</b> antes de leerla: realce de contraste (CLAHE),
+          binarizado, cierre morfológico, desenfoque suave y un servicio propio de OpenCV.
+          <b> Los cinco empeoraron el resultado.</b> Cuatro confirmaciones independientes.
+        </p>
+        <Beneficio>
+          la decisión de no seguir por ahí está respaldada con 140 mediciones, no con una impresión.
+        </Beneficio>
+      </>
+    ),
+  },
+  {
+    emoji: '💡',
+    titulo: 'Qué aprendimos',
+    cuerpo: (
+      <>
+        <p>
+          La pantalla del codificador se lee al <b>100%</b> y el fondo de la lata al <b>8%</b>, con el
+          mismo motor y en la misma foto. Eso dice dónde está el problema:
+        </p>
+        <Flujo pasos={['❌ No es el motor de IA', '❌ No es el procesamiento', '✅ Es la foto que llega']} />
+        <p>
+          El código es dot-matrix sobre aluminio curvo y brillante, y ocupa cerca del <b>3% del cuadro</b>.
+          Cuando la foto está bien sacada, se lee perfecto incluso con un OCR gratuito. Cuando no, no la
+          salva ningún modelo.
+        </p>
+        <ul className="pres-pasos">
+          <li>🎯 <b>Nunca aceptó una lectura incorrecta.</b> La que acertó tenía 92% de confianza y pasó
+            sola; las 11 que fallaron quedaron entre 8% y 40% y fueron a revisión. El sistema sabe cuándo
+            no sabe — y eso es lo que lo hace confiable.</li>
+          <li>🔄 <b>El resto del sistema funciona.</b> Recepción, deduplicado, evidencia, base, panel,
+            alertas y reportes están en producción y no dependen de esa lectura.</li>
+        </ul>
+        <Beneficio>
+          en vez de forzar un control automático que no llega, la persona decide y la IA le ahorra el
+          trabajo: ordena la cola, pre-completa el formulario y avisa cuando falta un control.
+        </Beneficio>
+      </>
+    ),
+  },
+  {
     emoji: '🚀',
     titulo: 'Beneficios y qué sigue',
     cuerpo: (

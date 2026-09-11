@@ -493,9 +493,23 @@ tbody tr:hover { background: color-mix(in srgb, var(--primary) 18%, var(--surfac
   box-shadow: 3px 3px 0 var(--fg);
 }
 .pres-flujo-flecha { color: var(--naranja); font-weight: 900; padding: 0 3px; }
-.pres-tabla { width: 100%; border-collapse: collapse; font-size: 13px; }
-.pres-tabla th { text-align: left; font-size: 11px; }
-.pres-tabla td { font-size: 12.5px; font-weight: 500; }
+.pres-tabla {
+  width: 100%; border-collapse: collapse; font-size: 13px;
+  border: 2px solid var(--fg); box-shadow: 3px 3px 0 var(--fg); background: var(--surface);
+  /* En pantallas angostas la tabla no se achica: se scrollea sola dentro de la slide. */
+  display: block; overflow-x: auto; white-space: nowrap;
+}
+.pres-tabla thead th {
+  text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .06em;
+  background: var(--fg); color: var(--bg); padding: 8px 12px; font-weight: 700;
+}
+.pres-tabla td {
+  font-size: 12.5px; font-weight: 500; padding: 8px 12px;
+  border-top: 1px solid var(--border); font-variant-numeric: tabular-nums;
+}
+.pres-tabla tbody tr:last-child td { background: var(--primary); color: var(--tinta); }
+.pres-cuerpo-full .pres-tabla { font-size: clamp(12px, 1.9vh, 15px); }
+.pres-cuerpo-full .pres-tabla td { font-size: clamp(12px, 1.9vh, 15px); }
 .pres-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 18px 0 30px; }
 .pres-dots { display: flex; gap: 7px; }
 .pres-dot {
