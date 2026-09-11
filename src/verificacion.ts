@@ -115,17 +115,38 @@ function parsearVto(vto: string): Date | null {
  * capturó — no del día de hoy: una evidencia de la semana pasada se juzga con el
  * lote que correspondía esa semana.
  */
-export function verificar(lata: Evidencia, tablero: Evidencia | null): Veredicto {
+export function verificar(
+  lata: Evidencia,
+  tablero: Evidencia | null,
+  /**
+   * El lote que leyó LA PERSONA en la foto. Cuando viene, manda sobre lo que
+   * haya leído la IA.
+   *
+   * Es la corrección más importante del panel. Con 8-20% de acierto en el fondo
+   * de la lata, calcular el veredicto sobre la lectura de la IA produce desvíos
+   * inventados: una lata que decía 251, con el tablero diciendo 251, salía como
+   * "Desvío de lote" porque la IA había leído 85. Y un cartel rojo sobre una
+   * lectura equivocada no es solo inútil — ancla al revisor y lo empuja a
+   * rechazar una lata que estaba bien.
+   *
+   * El tablero sí se lee con la IA: ahí el acierto medido es 100%.
+   */
+  loteManual?: string,
+): Veredicto {
   const esperados = lotesEsperados(lata.fecha);
-  const lote = loteDeEvidencia(lata);
+  const lote = (loteManual ?? '').trim() || loteDeEvidencia(lata);
   const vto = vtoDeEvidencia(lata);
   const loteTablero = tablero ? loteDeEvidencia(tablero) : null;
 
   const calendario = lote ? esperados.some((e) => mismoLote(lote, String(e))) : null;
   const cTablero = mismoLote(lote, loteTablero);
 
+  // El chequeo interno (vto = lote + 270 días) solo corre si los dos campos
+  // salen de la MISMA fuente. Cruzar un lote leído por la persona contra un
+  // vencimiento leído por la IA compara dos cosas que no tienen por qué
+  // corresponderse, y produce incoherencias falsas.
   let interna: boolean | null = null;
-  const vtoFecha = parsearVto(vto);
+  const vtoFecha = loteManual ? null : parsearVto(vto);
   if (vtoFecha && /^\d{1,3}$/.test(lote)) {
     const impresion = new Date(vtoFecha);
     impresion.setDate(impresion.getDate() - VIDA_UTIL_DIAS);

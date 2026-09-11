@@ -96,6 +96,8 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
   // pestaña porque son del mismo rol y la pregunta '¿qué hizo el turno anterior?'
   // aparece justo cuando estás por empezar a revisar.
   const [vista, setVista] = useState<'cola' | 'historial'>('cola');
+  // El lote que LEE LA PERSONA en la foto. Es el dato con el que se decide.
+  const [loteLeido, setLoteLeido] = useState('');
   const zonaRef = useRef<HTMLDivElement>(null);
 
   const cola = useMemo(
@@ -111,7 +113,7 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
 
   // Cada evidencia arranca con la foto "sana": si no, un fallo puntual dejaría el
   // cartel de error puesto para todas las siguientes.
-  useEffect(() => { setFotoRota(false); }, [actual?.evidenceId]);
+  useEffect(() => { setFotoRota(false); setLoteLeido(''); }, [actual?.evidenceId]);
 
   // El tablero se busca sobre TODAS las evidencias, no sobre la cola: el tablero
   // de la tanda normalmente ya fue procesado y no está pendiente de revisión.
@@ -120,8 +122,8 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
     [actual, evidencias],
   );
   const veredicto = useMemo(
-    () => (actual ? verificar(actual, tablero) : null),
-    [actual, tablero],
+    () => (actual ? verificar(actual, tablero, loteLeido) : null),
+    [actual, tablero, loteLeido],
   );
 
   const resolver = useCallback(async (accion: Accion, motivoElegido = '') => {
@@ -130,7 +132,10 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
     setError(null);
     setGuardando(true);
     try {
-      if (onResolver) await onResolver(actual.evidenceId, accion, motivoElegido, comentario);
+      // El lote que leyó la persona se guarda junto a la decisión: es el dato
+      // que después permite medir cuánto acierta la IA sin montar otro banco.
+      const nota = [loteLeido && `lote leído: ${loteLeido}`, comentario].filter(Boolean).join(' · ');
+      if (onResolver) await onResolver(actual.evidenceId, accion, motivoElegido, nota);
       setResueltas((r) => ({ ...r, [actual.evidenceId]: accion }));
       setPidiendoMotivo(false);
       setMotivo('');
@@ -140,7 +145,7 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
     } finally {
       setGuardando(false);
     }
-  }, [actual, comentario, guardando, onResolver]);
+  }, [actual, comentario, guardando, loteLeido, onResolver]);
 
   // Atajos. Se ignoran mientras se escribe en un campo, para no disparar una
   // aprobación al tipear una "a" en el comentario.
@@ -318,11 +323,41 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
             <Confianza valor={actual.confianza} />
           </div>
 
-          {/* El veredicto de los tres testigos. Va ARRIBA de la sugerencia de la IA
-              porque es lo que el revisor necesita para decidir: la lectura del lote
-              acierta 8-20%, pero el cruce contra el calendario y el tablero es
-              aritmética, no OCR — eso sí es confiable. */}
-          {!esTablero(actual) && veredicto && (
+          {/* LO QUE LEE LA PERSONA. Es el dato con el que se decide.
+
+              La lectura de la IA ya NO se muestra acá. Con 8-20% de acierto en el
+              fondo de la lata producía desvíos inventados: una lata que decía 251,
+              con el tablero diciendo 251, salía como "Desvío de lote" porque la IA
+              había leído 85. Un cartel rojo sobre una lectura equivocada no es solo
+              inútil: ancla al revisor y lo empuja a rechazar una lata sana.
+
+              El campo arranca vacío y el valor esperado NO se muestra antes de
+              tipear — si se muestra, se deja de mirar la foto y se copia el número. */}
+          {!esTablero(actual) && (
+            <div className="bandeja-lectura">
+              <label htmlFor="lectura-lote">
+                <span className="bandeja-sug-et">¿Qué lote dice la lata?</span>
+                <input
+                  id="lectura-lote"
+                  className="input bandeja-lote-input"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  maxLength={4}
+                  placeholder="000"
+                  value={loteLeido}
+                  onChange={(ev) => setLoteLeido(ev.target.value.replace(/\D/g, '').slice(0, 4))}
+                />
+              </label>
+              <p className="bandeja-ayuda-lectura">
+                Leelo de la foto — ampliala si hace falta. El sistema compara contra el
+                tablero y el calendario recién <b>después</b> de que lo cargues.
+              </p>
+            </div>
+          )}
+
+          {/* El veredicto sale de la lectura de la persona, no de la IA. Sin lectura
+              cargada no hay veredicto: no hay nada que verificar todavía. */}
+          {!esTablero(actual) && veredicto && loteLeido.length >= 2 && (
             <div className={`bandeja-veredicto v-${veredicto.estado}`}>
               <div className="bandeja-veredicto-titulo">{veredicto.titulo}</div>
               <div className="bandeja-veredicto-detalle">{veredicto.detalle}</div>
@@ -330,7 +365,6 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
                 {([
                   ['Tablero', veredicto.checks.tablero],
                   ['Calendario', veredicto.checks.calendario],
-                  ['Vencimiento', veredicto.checks.interna],
                 ] as [string, boolean | null][]).map(([n, c]) => (
                   <span
                     key={n}
@@ -343,28 +377,21 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
             </div>
           )}
 
-          {/* Lo que sugiere la máquina, marcado como sugerencia y nunca como
-              veredicto: con 8-20% de acierto en el fondo de la lata, presentarlo
-              como decisión sería exactamente el error que este giro corrige. */}
-          <div className="bandeja-sugerencia">
-            <div className="bandeja-sug-et">Lo que leyó la IA — confirmá o corregí</div>
-            <dl className="bandeja-dl">
-              <dt>Resultado</dt>
-              <dd>{actual.resultado ?? '—'}</dd>
-              <dt>Impresión</dt>
-              <dd>{actual.calidadImpresion ?? '—'}</dd>
-              <dt>Coherencia con el tablero</dt>
-              <dd>{actual.coherencia === null ? 'no comparable' : actual.coherencia ? 'coincide' : 'difiere'}</dd>
-              {actual.horaPantalla && (<><dt>Hora del tablero</dt><dd>{actual.horaPantalla}</dd></>)}
-              {actual.textos.length > 0 && (
-                <><dt>Texto leído</dt><dd className="bandeja-mono">{actual.textos.join(' · ')}</dd></>
-              )}
-              {actual.defectos.length > 0 && (
-                <><dt>Defectos</dt><dd>{actual.defectos.join(', ')}</dd></>
-              )}
-              {actual.motivo && (<><dt>Motivo</dt><dd className="bandeja-mono">{actual.motivo}</dd></>)}
-            </dl>
-          </div>
+          {/* Lo que leyó la IA queda disponible pero PLEGADO. No se borra porque
+              sirve para diagnosticar por qué falló una lectura; se esconde porque
+              mostrarlo de entrada contamina la del revisor. */}
+          {actual.textos.length > 0 && (
+            <details className="bandeja-ia">
+              <summary>Ver lo que leyó la IA (no es confiable en el fondo de la lata)</summary>
+              <dl className="bandeja-dl">
+                <dt>Texto leído</dt>
+                <dd className="bandeja-mono">{actual.textos.join(' · ')}</dd>
+                {actual.calidadImpresion && (<><dt>Impresión</dt><dd>{actual.calidadImpresion}</dd></>)}
+                {actual.defectos.length > 0 && (<><dt>Defectos</dt><dd>{actual.defectos.join(', ')}</dd></>)}
+                {actual.motivo && (<><dt>Motivo</dt><dd className="bandeja-mono">{actual.motivo}</dd></>)}
+              </dl>
+            </details>
+          )}
 
           <label className="bandeja-campo">
             <span>Comentario (opcional)</span>

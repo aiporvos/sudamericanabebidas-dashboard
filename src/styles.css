@@ -815,3 +815,25 @@ tbody tr:hover { background: color-mix(in srgb, var(--primary) 18%, var(--surfac
 .chip-est-ok { color: var(--ok); }
 .chip-est-mal { color: var(--bad); }
 .chip-est-na { color: var(--muted); }
+
+/* ── Lectura manual: el dato con el que se decide ─────────────────────── */
+.bandeja-lectura {
+  border: 3px solid var(--fg); border-radius: 0.5rem; padding: 14px 16px;
+  background: var(--primary); color: var(--tinta); box-shadow: 4px 4px 0 var(--fg);
+}
+.bandeja-lectura label { display: flex; flex-direction: column; gap: 6px; }
+.bandeja-lectura .bandeja-sug-et { color: var(--tinta); opacity: .82; margin: 0; }
+.bandeja-lote-input {
+  font-family: 'Outfit', sans-serif; font-size: 30px; font-weight: 700;
+  letter-spacing: .1em; text-align: center; padding: 8px 12px; max-width: 190px;
+  font-variant-numeric: tabular-nums; background: var(--surface); color: var(--text);
+}
+.bandeja-ayuda-lectura { font-size: 12.5px; margin: 9px 0 0; color: var(--tinta); opacity: .8; }
+
+/* Lo que leyó la IA: disponible, pero plegado y sin jerarquía visual. */
+.bandeja-ia {
+  border: 2px dashed var(--border); border-radius: 0.5rem; padding: 10px 14px;
+  background: var(--surface); font-size: 13px;
+}
+.bandeja-ia summary { cursor: pointer; color: var(--muted); font-size: 12.5px; }
+.bandeja-ia[open] summary { margin-bottom: 9px; }
