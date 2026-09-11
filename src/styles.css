@@ -780,3 +780,38 @@ tbody tr:hover { background: color-mix(in srgb, var(--primary) 18%, var(--surfac
 .lupa-ayuda kbd {
   border: 1px solid #fff; border-radius: 3px; padding: 0 4px; font-family: inherit;
 }
+
+/* ── Historial de revisiones ──────────────────────────────────────────── */
+.historial { display: flex; flex-direction: column; gap: 14px; }
+.historial-barra {
+  display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap;
+  border: 2px solid var(--fg); border-radius: 0.5rem; padding: 12px 14px;
+  background: var(--surface); box-shadow: 3px 3px 0 var(--fg);
+}
+.historial-filtros { display: flex; gap: 7px; flex-wrap: wrap; }
+.historial-quien { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: var(--muted); min-width: 150px; }
+.historial-vacio { color: var(--muted); padding: 16px; font-size: 14px; }
+.historial-tabla-caja {
+  overflow-x: auto; border: 2px solid var(--fg); border-radius: 0.5rem;
+  box-shadow: 4px 4px 0 var(--fg); background: var(--surface);
+}
+.historial-tabla { border-collapse: collapse; width: 100%; min-width: 720px; font-size: 13.5px; }
+.historial-tabla thead th {
+  background: var(--fg); color: var(--bg); text-align: left; padding: 9px 12px;
+  font-size: 11px; text-transform: uppercase; letter-spacing: .06em;
+}
+.historial-tabla td { padding: 9px 12px; border-top: 1px solid var(--border); vertical-align: middle; }
+.historial-tabla tbody tr:nth-child(even) { background: var(--zebra); }
+.historial-tabla small { color: var(--muted); }
+.historial-mini {
+  width: 76px; height: 58px; object-fit: cover; cursor: zoom-in;
+  border: 2px solid var(--fg); border-radius: 5px; display: block; background: #000;
+}
+.historial-motivo { max-width: 30ch; font-size: 12.5px; color: var(--muted); }
+.chip-est {
+  display: inline-block; border: 1.5px solid currentColor; border-radius: 999px;
+  padding: 1px 10px; font-size: 11.5px; font-weight: 700; white-space: nowrap;
+}
+.chip-est-ok { color: var(--ok); }
+.chip-est-mal { color: var(--bad); }
+.chip-est-na { color: var(--muted); }

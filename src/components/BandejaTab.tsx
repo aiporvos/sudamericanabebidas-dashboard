@@ -4,6 +4,7 @@ import { cargarRevisor, guardarRevisor, imagenUrl, type Revisor } from '../api';
 import { MOTIVOS_RECHAZO, type Accion } from '../revision';
 import { esTablero, tableroDe, verificar } from '../verificacion';
 import { Lupa } from './Lupa';
+import { HistorialRevisiones } from './HistorialRevisiones';
 
 /**
  * Bandeja de Revisión — el corazón del Centro de Control.
@@ -91,6 +92,10 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
   const [editandoRevisor, setEditandoRevisor] = useState(false);
   // Qué foto está abierta en la lupa: la de la lata o la del tablero.
   const [ampliada, setAmpliada] = useState<null | 'lata' | 'tablero'>(null);
+  // Revisar y ver lo revisado son dos tareas distintas; conviven en la misma
+  // pestaña porque son del mismo rol y la pregunta '¿qué hizo el turno anterior?'
+  // aparece justo cuando estás por empezar a revisar.
+  const [vista, setVista] = useState<'cola' | 'historial'>('cola');
   const zonaRef = useRef<HTMLDivElement>(null);
 
   const cola = useMemo(
@@ -140,7 +145,9 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
   // Atajos. Se ignoran mientras se escribe en un campo, para no disparar una
   // aprobación al tipear una "a" en el comentario.
   useEffect(() => {
-    if (!activa) return;
+    // Ni con la pestaña oculta ni mirando el historial: en los dos casos una "a"
+    // aprobaría por detrás la evidencia que quedó en la cola.
+    if (!activa || vista !== 'cola' || ampliada) return;
     const onKey = (ev: KeyboardEvent) => {
       const t = ev.target as HTMLElement | null;
       if (t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
@@ -154,23 +161,23 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [activa, cola.length, resolver]);
+  }, [activa, ampliada, cola.length, resolver, vista]);
 
   const hechas = Object.keys(resueltas).length;
 
-  if (!actual) {
-    return (
-      <div className="bandeja-vacia">
-        <div className="bandeja-vacia-emoji">✓</div>
-        <h2>No queda nada por revisar</h2>
-        <p>
-          {hechas > 0
-            ? `Revisaste ${hechas} ${hechas === 1 ? 'evidencia' : 'evidencias'} en esta sesión.`
-            : 'Cuando lleguen evidencias que necesiten una persona, aparecen acá ordenadas por prioridad.'}
-        </p>
-      </div>
-    );
-  }
+  // La barra va SIEMPRE, también con la cola vacía: si no, el botón para ver las
+  // revisadas queda inalcanzable justo cuando terminás de revisar todo.
+  const colaVacia = (
+    <div className="bandeja-vacia">
+      <div className="bandeja-vacia-emoji">✓</div>
+      <h2>No queda nada por revisar</h2>
+      <p>
+        {hechas > 0
+          ? `Revisaste ${hechas} ${hechas === 1 ? 'evidencia' : 'evidencias'} en esta sesión.`
+          : 'Cuando lleguen evidencias que necesiten una persona, aparecen acá ordenadas por prioridad.'}
+      </p>
+    </div>
+  );
 
   return (
     <div className="bandeja" ref={zonaRef}>
@@ -182,6 +189,12 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
         <div className="bandeja-atajos">
           <kbd>A</kbd> aprobar <kbd>R</kbd> rechazar <kbd>O</kbd> observar <kbd>←</kbd><kbd>→</kbd> navegar
         </div>
+        <button
+          className={`btn${vista === 'historial' ? '' : ' btn-ghost'}`}
+          onClick={() => setVista((v) => (v === 'cola' ? 'historial' : 'cola'))}
+        >
+          {vista === 'cola' ? '🕘 Ver revisadas' : '← Volver a la cola'}
+        </button>
         <button className="btn btn-ghost" onClick={() => setEditandoRevisor((v) => !v)}>
           {revisor.usuario ? `👤 ${revisor.usuario}` : '⚠ Quién revisa'}
         </button>
@@ -228,6 +241,8 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
         </div>
       )}
 
+      {vista === 'historial' ? <HistorialRevisiones evidencias={evidencias} /> : !actual ? colaVacia : (
+      <>
       {ampliada && (
         <Lupa
           src={imagenUrl(ampliada === 'lata' ? actual.evidenceId : tablero!.evidenceId)}
@@ -406,6 +421,8 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
           </div>
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 }
