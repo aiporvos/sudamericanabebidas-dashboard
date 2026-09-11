@@ -711,3 +711,37 @@ tbody tr:hover { background: color-mix(in srgb, var(--primary) 18%, var(--surfac
 .bandeja-revisor-campos { display: flex; flex-wrap: wrap; gap: 12px; }
 .bandeja-revisor-campos label { display: flex; flex-direction: column; gap: 4px; flex: 1 1 200px; font-size: 12px; color: var(--muted); }
 .bandeja-revisor .btn { align-self: flex-start; }
+
+/* Lata y tablero lado a lado: es la comparación que el humano hace bien y la
+   máquina no. En pantalla angosta se apilan. */
+.bandeja-fotos { display: flex; flex-direction: column; gap: 12px; }
+.bandeja-foto-ref img { max-height: 34vh; }
+.bandeja-sin-tablero {
+  border: 2px dashed var(--fg); border-radius: 0.5rem; padding: 14px 16px;
+  background: var(--surface); font-size: 13.5px;
+}
+.bandeja-sin-tablero p { margin: 5px 0 0; color: var(--muted); }
+
+/* Veredicto de los tres testigos. Va arriba de la sugerencia de la IA porque el
+   cruce contra calendario y tablero es aritmética, no OCR: eso sí es confiable. */
+.bandeja-veredicto {
+  border: 2px solid var(--fg); border-radius: 0.5rem; padding: 14px 16px;
+  box-shadow: 3px 3px 0 var(--fg); background: var(--surface);
+}
+.bandeja-veredicto-titulo { font-family: 'Paytone One', sans-serif; font-size: 19px; line-height: 1.2; }
+.bandeja-veredicto-detalle { font-size: 14px; margin-top: 5px; }
+.bandeja-veredicto.v-ok, .bandeja-veredicto.v-ok-sin-tablero { background: var(--ok); color: #fff; }
+.bandeja-veredicto.v-codificadora, .bandeja-veredicto.v-desvio { background: var(--bad); color: #fff; }
+.bandeja-veredicto.v-tablero-viejo, .bandeja-veredicto.v-vto-incoherente,
+.bandeja-veredicto.v-fuera-de-fecha { background: var(--primary); color: var(--tinta); }
+
+.bandeja-testigos { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.bandeja-testigos .testigo {
+  font-size: 12px; font-weight: 700; border-radius: 999px; padding: 2px 10px;
+  border: 1.5px solid currentColor; background: rgba(255,255,255,.16); white-space: nowrap;
+}
+
+@media (min-width: 900px) {
+  .bandeja-fotos { flex-direction: row; align-items: flex-start; }
+  .bandeja-fotos > * { flex: 1 1 0; min-width: 0; }
+}

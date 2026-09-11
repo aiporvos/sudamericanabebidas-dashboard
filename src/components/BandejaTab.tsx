@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Evidencia } from '../types';
 import { cargarRevisor, guardarRevisor, imagenUrl, type Revisor } from '../api';
 import { MOTIVOS_RECHAZO, type Accion } from '../revision';
+import { esTablero, tableroDe, verificar } from '../verificacion';
 
 /**
  * Bandeja de Revisión — el corazón del Centro de Control.
@@ -103,6 +104,17 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
   // Cada evidencia arranca con la foto "sana": si no, un fallo puntual dejaría el
   // cartel de error puesto para todas las siguientes.
   useEffect(() => { setFotoRota(false); }, [actual?.evidenceId]);
+
+  // El tablero se busca sobre TODAS las evidencias, no sobre la cola: el tablero
+  // de la tanda normalmente ya fue procesado y no está pendiente de revisión.
+  const tablero = useMemo(
+    () => (actual && !esTablero(actual) ? tableroDe(actual, evidencias) : null),
+    [actual, evidencias],
+  );
+  const veredicto = useMemo(
+    () => (actual ? verificar(actual, tablero) : null),
+    [actual, tablero],
+  );
 
   const resolver = useCallback(async (accion: Accion, motivoElegido = '') => {
     if (!actual || guardando) return;
@@ -214,34 +226,87 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
       )}
 
       <div className="bandeja-grid">
-        <figure className="bandeja-foto">
-          {/* La foto es lo que se está juzgando: si no carga, hay que decirlo fuerte
-              en vez de dejar el ícono de imagen rota. Aprobar sin ver la evidencia
-              es peor que no aprobar. */}
-          {fotoRota ? (
-            <div className="bandeja-foto-rota">
-              <div className="bandeja-foto-rota-icono">⚠</div>
-              <p><b>No se pudo cargar la foto.</b></p>
-              <p>No apruebes sin verla. Probá actualizar; si sigue sin aparecer, avisá que la evidencia no está disponible.</p>
-              <code>{actual.evidenceId}</code>
-            </div>
-          ) : (
-            <img
-              src={imagenUrl(actual.evidenceId)}
-              alt={`Evidencia ${actual.evidenceId}`}
-              onError={() => setFotoRota(true)}
-            />
+        <div className="bandeja-fotos">
+          <figure className="bandeja-foto">
+            {/* La foto es lo que se está juzgando: si no carga, hay que decirlo fuerte
+                en vez de dejar el ícono de imagen rota. Aprobar sin ver la evidencia
+                es peor que no aprobar. */}
+            {fotoRota ? (
+              <div className="bandeja-foto-rota">
+                <div className="bandeja-foto-rota-icono">⚠</div>
+                <p><b>No se pudo cargar la foto.</b></p>
+                <p>No apruebes sin verla. Probá actualizar; si sigue sin aparecer, avisá que la evidencia no está disponible.</p>
+                <code>{actual.evidenceId}</code>
+              </div>
+            ) : (
+              <img
+                src={imagenUrl(actual.evidenceId)}
+                alt={`Evidencia ${actual.evidenceId}`}
+                onError={() => setFotoRota(true)}
+              />
+            )}
+            <figcaption>
+              <b>{esTablero(actual) ? 'Tablero' : 'Lata'}</b> · {actual.linea}
+              {actual.equipo && ` · ${actual.equipo}`} · {actual.fecha.toLocaleString('es-AR')}
+            </figcaption>
+          </figure>
+
+          {/* El tablero de la misma tanda, al lado. Es la comparación que el humano
+              hace bien y la máquina no. Se busca hacia adelante Y hacia atrás en el
+              tiempo: en el grupo real se vio la lata a las 08:04 y su tablero a las
+              09:03, así que emparejar solo hacia atrás deja sin referencia a la
+              primera lata de cada tanda. */}
+          {!esTablero(actual) && (
+            tablero ? (
+              <figure className="bandeja-foto bandeja-foto-ref">
+                <img src={imagenUrl(tablero.evidenceId)} alt="Tablero de la tanda" />
+                <figcaption>
+                  <b>Tablero de la tanda</b> · {tablero.fecha.toLocaleTimeString('es-AR')}
+                  {' · '}{Math.round(Math.abs(tablero.fecha.getTime() - actual.fecha.getTime()) / 60000)} min de diferencia
+                </figcaption>
+              </figure>
+            ) : (
+              <div className="bandeja-sin-tablero">
+                <b>Sin tablero en esta tanda.</b>
+                <p>
+                  No hay foto del codificador de esta línea dentro de las 4 horas. Se puede
+                  juzgar por el calendario, pero no se puede confirmar contra la máquina.
+                </p>
+              </div>
+            )
           )}
-          <figcaption>
-            {actual.linea}{actual.equipo && ` · ${actual.equipo}`} · {actual.fecha.toLocaleString('es-AR')}
-          </figcaption>
-        </figure>
+        </div>
 
         <div className="bandeja-datos">
           <div className="bandeja-cab">
             <span className="bandeja-tipo">{actual.tipoFoto ?? 'sin clasificar'}</span>
             <Confianza valor={actual.confianza} />
           </div>
+
+          {/* El veredicto de los tres testigos. Va ARRIBA de la sugerencia de la IA
+              porque es lo que el revisor necesita para decidir: la lectura del lote
+              acierta 8-20%, pero el cruce contra el calendario y el tablero es
+              aritmética, no OCR — eso sí es confiable. */}
+          {!esTablero(actual) && veredicto && (
+            <div className={`bandeja-veredicto v-${veredicto.estado}`}>
+              <div className="bandeja-veredicto-titulo">{veredicto.titulo}</div>
+              <div className="bandeja-veredicto-detalle">{veredicto.detalle}</div>
+              <div className="bandeja-testigos">
+                {([
+                  ['Tablero', veredicto.checks.tablero],
+                  ['Calendario', veredicto.checks.calendario],
+                  ['Vencimiento', veredicto.checks.interna],
+                ] as [string, boolean | null][]).map(([n, c]) => (
+                  <span
+                    key={n}
+                    className={`testigo ${c === true ? 'testigo-ok' : c === false ? 'testigo-mal' : 'testigo-na'}`}
+                  >
+                    {c === true ? '✓' : c === false ? '✗' : '–'} {n}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Lo que sugiere la máquina, marcado como sugerencia y nunca como
               veredicto: con 8-20% de acierto en el fondo de la lata, presentarlo
