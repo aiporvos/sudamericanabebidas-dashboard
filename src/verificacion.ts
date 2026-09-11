@@ -132,10 +132,12 @@ export function verificar(
    * El tablero sí se lee con la IA: ahí el acierto medido es 100%.
    */
   loteManual?: string,
+  /** El vencimiento que leyó la persona. Habilita el chequeo de coherencia. */
+  vtoManual?: string,
 ): Veredicto {
   const esperados = lotesEsperados(lata.fecha);
   const lote = (loteManual ?? '').trim() || loteDeEvidencia(lata);
-  const vto = vtoDeEvidencia(lata);
+  const vto = (vtoManual ?? '').trim() || (loteManual ? '' : vtoDeEvidencia(lata));
   const loteTablero = tablero ? loteDeEvidencia(tablero) : null;
 
   const calendario = lote ? esperados.some((e) => mismoLote(lote, String(e))) : null;
@@ -145,8 +147,13 @@ export function verificar(
   // salen de la MISMA fuente. Cruzar un lote leído por la persona contra un
   // vencimiento leído por la IA compara dos cosas que no tienen por qué
   // corresponderse, y produce incoherencias falsas.
+  //
+  // Con los dos cargados a mano vuelve a tener sentido, y es el único chequeo
+  // que no necesita ni tablero ni saber qué día es: la lata trae lote Y
+  // vencimiento, y entre ellos tiene que haber exactamente 270 días.
   let interna: boolean | null = null;
-  const vtoFecha = loteManual ? null : parsearVto(vto);
+  const mismaFuente = (loteManual && vtoManual) || (!loteManual && !vtoManual);
+  const vtoFecha = mismaFuente ? parsearVto(vto) : null;
   if (vtoFecha && /^\d{1,3}$/.test(lote)) {
     const impresion = new Date(vtoFecha);
     impresion.setDate(impresion.getDate() - VIDA_UTIL_DIAS);

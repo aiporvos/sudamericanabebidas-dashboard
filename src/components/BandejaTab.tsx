@@ -91,6 +91,8 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
   const [vista, setVista] = useState<'cola' | 'historial'>('cola');
   // El lote que LEE LA PERSONA en la foto. Es el dato con el que se decide.
   const [loteLeido, setLoteLeido] = useState('');
+  const [horaLeida, setHoraLeida] = useState('');
+  const [vtoLeido, setVtoLeido] = useState('');
   const zonaRef = useRef<HTMLDivElement>(null);
 
   const cola = useMemo(
@@ -106,7 +108,21 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
 
   // Cada evidencia arranca con la foto "sana": si no, un fallo puntual dejaría el
   // cartel de error puesto para todas las siguientes.
-  useEffect(() => { setFotoRota(false); setLoteLeido(''); }, [actual?.evidenceId]);
+  useEffect(() => {
+    setFotoRota(false);
+    setLoteLeido('');
+    setVtoLeido('');
+    // La hora se precarga con el momento de la captura, en hora de PLANTA. Se fija
+    // la zona horaria a mano en vez de confiar en la del navegador: si el revisor
+    // entra desde otra zona (o un servidor en UTC), la hora precargada saldría
+    // corrida y nadie se daría cuenta.
+    setHoraLeida(actual
+      ? actual.fecha.toLocaleTimeString('es-AR', {
+          hour: '2-digit', minute: '2-digit', hour12: false,
+          timeZone: 'America/Argentina/Buenos_Aires',
+        })
+      : '');
+  }, [actual?.evidenceId]);
 
   // El tablero se busca sobre TODAS las evidencias, no sobre la cola: el tablero
   // de la tanda normalmente ya fue procesado y no está pendiente de revisión.
@@ -115,8 +131,8 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
     [actual, evidencias],
   );
   const veredicto = useMemo(
-    () => (actual ? verificar(actual, tablero, loteLeido) : null),
-    [actual, tablero, loteLeido],
+    () => (actual ? verificar(actual, tablero, loteLeido, vtoLeido) : null),
+    [actual, tablero, loteLeido, vtoLeido],
   );
 
   const resolver = useCallback(async (accion: Accion, motivoElegido = '') => {
@@ -127,7 +143,12 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
     try {
       // El lote que leyó la persona se guarda junto a la decisión: es el dato
       // que después permite medir cuánto acierta la IA sin montar otro banco.
-      const nota = [loteLeido && `lote leído: ${loteLeido}`, comentario].filter(Boolean).join(' · ');
+      const nota = [
+        loteLeido && `lote: ${loteLeido}`,
+        horaLeida && `hora: ${horaLeida}`,
+        vtoLeido && `vto: ${vtoLeido}`,
+        comentario,
+      ].filter(Boolean).join(' · ');
       if (onResolver) await onResolver(actual.evidenceId, accion, motivoElegido, nota);
       setResueltas((r) => ({ ...r, [actual.evidenceId]: accion }));
       setPidiendoMotivo(false);
@@ -138,7 +159,7 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
     } finally {
       setGuardando(false);
     }
-  }, [actual, comentario, guardando, loteLeido, onResolver]);
+  }, [actual, comentario, guardando, horaLeida, loteLeido, onResolver, vtoLeido]);
 
   // Atajos. Se ignoran mientras se escribe en un campo, para no disparar una
   // aprobación al tipear una "a" en el comentario.
@@ -339,22 +360,57 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
               tipear — si se muestra, se deja de mirar la foto y se copia el número. */}
           {!esTablero(actual) && (
             <div className="bandeja-lectura">
-              <label htmlFor="lectura-lote">
-                <span className="bandeja-sug-et">¿Qué lote dice la lata?</span>
-                <input
-                  id="lectura-lote"
-                  className="input bandeja-lote-input"
-                  inputMode="numeric"
-                  autoComplete="off"
-                  maxLength={4}
-                  placeholder="000"
-                  value={loteLeido}
-                  onChange={(ev) => setLoteLeido(ev.target.value.replace(/\D/g, '').slice(0, 4))}
-                />
-              </label>
+              <span className="bandeja-sug-et">¿Qué dice la lata?</span>
+              <div className="bandeja-campos-lectura">
+                <label htmlFor="lectura-lote">
+                  <span>Lote</span>
+                  <input
+                    id="lectura-lote"
+                    className="input bandeja-lote-input"
+                    inputMode="numeric"
+                    autoComplete="off"
+                    maxLength={4}
+                    placeholder="000"
+                    value={loteLeido}
+                    onChange={(ev) => setLoteLeido(ev.target.value.replace(/\D/g, '').slice(0, 4))}
+                  />
+                </label>
+
+                {/* La hora viene precargada con el momento de la captura: la lata se
+                    fotografía al salir de la codificadora, así que la hora impresa y la
+                    de la foto coinciden salvo minutos. No se compara contra nada —la del
+                    tablero es la del mensaje cargado, no la de esta lata— así que
+                    precargarla no compromete ningún control y ahorra tipear en cada foto. */}
+                <label htmlFor="lectura-hora">
+                  <span>Hora <em>(precargada)</em></span>
+                  <input
+                    id="lectura-hora"
+                    className="input bandeja-hora-input"
+                    autoComplete="off"
+                    maxLength={5}
+                    placeholder="00:00"
+                    value={horaLeida}
+                    onChange={(ev) => setHoraLeida(ev.target.value.slice(0, 5))}
+                  />
+                </label>
+
+                <label htmlFor="lectura-vto">
+                  <span>Vencimiento</span>
+                  <input
+                    id="lectura-vto"
+                    className="input bandeja-vto-input"
+                    inputMode="numeric"
+                    autoComplete="off"
+                    maxLength={8}
+                    placeholder="dd/mm/aa"
+                    value={vtoLeido}
+                    onChange={(ev) => setVtoLeido(ev.target.value.replace(/[^\d/]/g, '').slice(0, 8))}
+                  />
+                </label>
+              </div>
               <p className="bandeja-ayuda-lectura">
-                Leelo de la foto — ampliala si hace falta. El sistema compara contra el
-                tablero y el calendario recién <b>después</b> de que lo cargues.
+                Leelos de la foto — ampliala si hace falta. El sistema compara recién
+                <b> después</b> de que los cargues.
               </p>
             </div>
           )}
@@ -369,6 +425,7 @@ export function BandejaTab({ evidencias, activa = true, onResolver }: Props) {
                 {([
                   ['Tablero', veredicto.checks.tablero],
                   ['Calendario', veredicto.checks.calendario],
+                  ['Vencimiento', veredicto.checks.interna],
                 ] as [string, boolean | null][]).map(([n, c]) => (
                   <span
                     key={n}

@@ -823,11 +823,21 @@ tbody tr:hover { background: color-mix(in srgb, var(--primary) 18%, var(--surfac
 }
 .bandeja-lectura label { display: flex; flex-direction: column; gap: 6px; }
 .bandeja-lectura .bandeja-sug-et { color: var(--tinta); opacity: .82; margin: 0; }
-.bandeja-lote-input {
-  font-family: 'Outfit', sans-serif; font-size: 30px; font-weight: 700;
-  letter-spacing: .1em; text-align: center; padding: 8px 12px; max-width: 190px;
-  font-variant-numeric: tabular-nums; background: var(--surface); color: var(--text);
+.bandeja-campos-lectura { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+.bandeja-campos-lectura label { display: flex; flex-direction: column; gap: 4px; }
+.bandeja-campos-lectura label > span {
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em;
+  color: var(--tinta); opacity: .78;
 }
+.bandeja-campos-lectura label > span em { font-style: normal; text-transform: none; letter-spacing: 0; opacity: .8; }
+.bandeja-lote-input, .bandeja-hora-input, .bandeja-vto-input {
+  font-family: 'Outfit', sans-serif; font-weight: 700; letter-spacing: .06em;
+  text-align: center; padding: 8px 10px; font-variant-numeric: tabular-nums;
+  background: var(--surface); color: var(--text);
+}
+.bandeja-lote-input { font-size: 30px; width: 120px; }
+.bandeja-hora-input { font-size: 22px; width: 110px; }
+.bandeja-vto-input  { font-size: 22px; width: 150px; }
 .bandeja-ayuda-lectura { font-size: 12.5px; margin: 9px 0 0; color: var(--tinta); opacity: .8; }
 
 /* Lo que leyó la IA: disponible, pero plegado y sin jerarquía visual. */
