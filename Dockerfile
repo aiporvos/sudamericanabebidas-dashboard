@@ -8,7 +8,7 @@ RUN npm ci || npm install
 COPY . .
 # URL del webhook n8n (WF6) y contraseña de acceso. Se fijan en build-time
 # porque Vite las inyecta en el bundle (no hay backend propio en esta SPA).
-ARG VITE_WEBHOOK_URL=https://n8n.aiporvos.com/webhook/dashboard-calidad
+ARG VITE_WEBHOOK_URL=https://n8n.cluna.ar/webhook/dashboard-calidad
 ARG VITE_DASHBOARD_PASSWORD=calidad2026
 ENV VITE_WEBHOOK_URL=$VITE_WEBHOOK_URL
 ENV VITE_DASHBOARD_PASSWORD=$VITE_DASHBOARD_PASSWORD

@@ -24,7 +24,7 @@ npm run build      # typecheck + bundle en dist/
 ```
 
 La URL del webhook se puede cambiar con `VITE_WEBHOOK_URL` (default:
-`https://n8n.aiporvos.com/webhook/dashboard-calidad`).
+`https://n8n.cluna.ar/webhook/dashboard-calidad`).
 
 ## Login
 
@@ -48,7 +48,7 @@ Componente en `src/components/ChatWidget.tsx`, lógica de sesión/fetch en `src/
   para que n8n pueda mantener contexto entre recargas. Botón "Nueva sesión" en la cabecera
   del chat lo resetea.
 - **Endpoint**: `POST` a `VITE_CHAT_WEBHOOK_URL` (default:
-  `https://n8n.aiporvos.com/webhook/dashboard-calidad-chat`), body
+  `https://n8n.cluna.ar/webhook/dashboard-calidad-chat`), body
   `{ "session_id": "...", "mensaje": "..." }`, respuesta esperada `{ "respuesta": "..." }`.
   Timeout de 30s con `AbortController`.
 
@@ -102,6 +102,6 @@ El navegador solo puede leer el webhook si n8n responde con
 y en el nodo "Responder JSON". Sin esto, el dashboard queda en «datos de ejemplo» con el banner rojo.
 
 Checklist rápido si no carga:
-1. WF6 **activo** en n8n (toggle ON) → probar `curl https://n8n.aiporvos.com/webhook/dashboard-calidad`.
+1. WF6 **activo** en n8n (toggle ON) → probar `curl https://n8n.cluna.ar/webhook/dashboard-calidad`.
 2. CORS configurado (ver arriba).
 3. Vista `v_evidencias_completas` existente en Postgres (`db/vistas-bi.sql`).

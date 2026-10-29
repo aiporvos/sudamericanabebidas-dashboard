@@ -5,7 +5,7 @@
 // esperado, no un bug.
 export const CHAT_WEBHOOK_URL: string =
   (import.meta as any).env?.VITE_CHAT_WEBHOOK_URL ??
-  'https://n8n.aiporvos.com/webhook/dashboard-calidad-chat';
+  'https://n8n.cluna.ar/webhook/dashboard-calidad-chat';
 
 const CLAVE_SESION = 'sudamericana_calidad_chat_session';
 

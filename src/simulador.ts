@@ -6,7 +6,7 @@ import type { Evidencia } from './types';
 
 export const SIM_WEBHOOK_URL: string =
   (import.meta as any).env?.VITE_SIM_WEBHOOK_URL ??
-  'https://n8n.aiporvos.com/webhook/simulador-calidad';
+  'https://n8n.cluna.ar/webhook/simulador-calidad';
 
 const CLAVE_TOKEN = 'sudamericana_calidad_sim_token';
 

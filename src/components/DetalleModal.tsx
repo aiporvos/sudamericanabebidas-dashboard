@@ -15,7 +15,7 @@ function Campo({ label, children }: { label: string; children: React.ReactNode }
 // Formulario de WF4 (bandeja de revisión manual) — el revisor pega ahí el Evidence ID.
 const FORM_REVISION_URL: string =
   (import.meta as any).env?.VITE_FORM_REVISION_URL ??
-  'https://n8n.aiporvos.com/form/4b10e382-a130-459a-af18-9d515ff434b3';
+  'https://n8n.cluna.ar/form/4b10e382-a130-459a-af18-9d515ff434b3';
 
 export function DetalleModal({ evidencia, onClose }: { evidencia: Evidencia; onClose: () => void }) {
   const [imgEstado, setImgEstado] = useState<'cargando' | 'ok' | 'error'>('cargando');

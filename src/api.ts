@@ -3,7 +3,7 @@ import type { Evidencia, RawEvidencia } from './types';
 // URL del webhook n8n (WF6 "API Dashboard"). Se puede sobreescribir con VITE_WEBHOOK_URL.
 export const WEBHOOK_URL: string =
   (import.meta as any).env?.VITE_WEBHOOK_URL ??
-  'https://n8n.aiporvos.com/webhook/dashboard-calidad';
+  'https://n8n.cluna.ar/webhook/dashboard-calidad';
 
 // Endpoint de la foto original (mismo WF6, path <webhook>-imagen). Se usa en <img>,
 // que no exige CORS, así que sirve directo desde n8n → MinIO.
