@@ -2,7 +2,7 @@
 // para que los charts cambien con el tema claro/oscuro sin re-render:
 // SVG acepta var(--x) en fill/stroke y los estilos inline del tooltip también.
 // Oscuro: validada contra #151820 (script validate_palette de la skill dataviz).
-// Claro: mapeada a la paleta cluna.ar (#0ba95b/#bc0f31/#fc7428/#7b5ea7 sobre crema).
+// Claro: colores del isotipo Sudamericana (#21bb9f/#f35c60/#e0a030/#455296 sobre blanco).
 export const SERIE = {
   ok: 'var(--serie-ok)',       // verde/teal — resultado OK
   noOk: 'var(--serie-nook)',   // rojo       — resultado No OK

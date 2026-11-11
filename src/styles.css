@@ -1,60 +1,76 @@
-/* ── Neo-brutalismo cálido (sistema de marca cluna.ar) · Sudamericana Calidad ──
+/* ── Sudamericana Calidad · estructura neo-brutalista con colores de marca Sudamericana ──
    Reglas de la piel: paleta exacta, Paytone One para títulos / Outfit para todo
    lo demás, bordes sólidos 2px color foreground, sombras duras sin blur con
    offset abajo-derecha, radius 0.5rem (píldora solo en botones/chips), cero
    gradientes. Claro y oscuro por tokens semánticos. */
 
+/* Paleta de marca Sudamericana de Bebidas: azul del logotipo (#455296) + acentos
+   del isotipo (verde agua, coral, ámbar, violeta). Claro = fondo blanco (default). */
 :root {
-  /* modo oscuro (default) */
-  --bg: #0f0d0e;
-  --surface: #17140f;
-  --zebra: #141110;
-  --fg: #f9f4da;                       /* texto y bordes */
-  --text: #f9f4da;
-  --text-2: rgba(249, 244, 218, 0.62);
-  --border: #f9f4da;
-  --border-2: #f9f4da;
-  /* paleta cluna.ar */
-  --primary: #fcba28;                  /* CTAs y acentos principales */
-  --naranja: #fc7428;
-  --ok: #0ba95b;
-  --bad: #bc0f31;
-  --warn: #fc7428;
-  --rosa: #f38ba3;
-  --purple: #7b5ea7;
-  --celeste: #12b5e5;
-  --teal: #0ba95b;                     /* alias legado → verde positivo */
-  /* tinta fija para texto sobre acentos claros (amarillo/verde/rosa) */
-  --tinta: #231f20;
+  /* modo oscuro */
+  --bg: #0f1120;
+  --surface: #171a2e;
+  --zebra: #141729;
+  --fg: #e8eaf6;                       /* texto y bordes */
+  --text: #e8eaf6;
+  --text-2: rgba(232, 234, 246, 0.62);
+  --border: #e8eaf6;
+  --border-2: #e8eaf6;
+  /* paleta Sudamericana */
+  --primary: #5b6bc0;                  /* CTAs y acentos principales */
+  --naranja: #e0a030;
+  --ok: #21bb9f;
+  --bad: #f35c60;
+  --warn: #e0a030;
+  --rosa: #f35c60;
+  --purple: #a25071;
+  --celeste: #4ab6c8;
+  --teal: #21bb9f;                     /* alias legado → verde positivo */
+  /* texto sobre acentos */
+  --tinta: #ffffff;
   /* charts */
-  --serie-ok: #0ba95b;
-  --serie-nook: #bc0f31;
-  --serie-rev: #fc7428;
-  --serie-acento: #7b5ea7;
-  --chart-grid: rgba(249, 244, 218, 0.16);
-  --chart-eje: rgba(249, 244, 218, 0.62);
-  --chart-surface: #17140f;
-  --chart-cursor: rgba(249, 244, 218, 0.08);
-  --tooltip-bg: #17140f;
-  --tooltip-border: #f9f4da;
+  --serie-ok: #21bb9f;
+  --serie-nook: #f35c60;
+  --serie-rev: #e0a030;
+  --serie-acento: #7d8ad4;
+  --chart-grid: rgba(232, 234, 246, 0.16);
+  --chart-eje: rgba(232, 234, 246, 0.62);
+  --chart-surface: #171a2e;
+  --chart-cursor: rgba(232, 234, 246, 0.08);
+  --tooltip-bg: #171a2e;
+  --tooltip-border: #e8eaf6;
   --scheme: dark;
 }
 
 [data-theme='light'] {
-  --bg: #f9f4da;                       /* crema */
-  --surface: #fffcf0;
-  --zebra: #f4eed4;
-  --fg: #231f20;                       /* charcoal */
-  --text: #231f20;
-  --text-2: rgba(35, 31, 32, 0.62);
-  --border: #231f20;
-  --border-2: #231f20;
-  --chart-grid: rgba(35, 31, 32, 0.14);
-  --chart-eje: rgba(35, 31, 32, 0.62);
-  --chart-surface: #fffcf0;
-  --chart-cursor: rgba(35, 31, 32, 0.06);
-  --tooltip-bg: #fffcf0;
-  --tooltip-border: #231f20;
+  --bg: #ffffff;                       /* fondo blanco */
+  --surface: #ffffff;
+  --zebra: #f4f5fb;
+  --fg: #232a5c;                       /* azul marino: texto, bordes y sombras */
+  --text: #1d2245;
+  --text-2: rgba(29, 34, 69, 0.64);
+  --border: #232a5c;
+  --border-2: #232a5c;
+  --primary: #455296;                  /* azul del logotipo */
+  --naranja: #b86e0b;
+  --ok: #138a75;                       /* verde agua del isotipo, oscurecido para contraste */
+  --bad: #d63f45;                      /* coral del isotipo */
+  --warn: #b86e0b;                     /* ámbar del isotipo */
+  --rosa: #d63f45;
+  --purple: #67426e;
+  --celeste: #1f8a9c;
+  --teal: #138a75;
+  --tinta: #ffffff;
+  --serie-ok: #21bb9f;
+  --serie-nook: #f35c60;
+  --serie-rev: #e0a030;
+  --serie-acento: #455296;
+  --chart-grid: rgba(35, 42, 92, 0.12);
+  --chart-eje: rgba(29, 34, 69, 0.64);
+  --chart-surface: #ffffff;
+  --chart-cursor: rgba(35, 42, 92, 0.06);
+  --tooltip-bg: #ffffff;
+  --tooltip-border: #232a5c;
   --scheme: light;
 }
 
@@ -194,11 +210,11 @@ tbody tr:hover { background: color-mix(in srgb, var(--primary) 18%, var(--surfac
   border: 2px solid var(--fg); padding: 2px 9px; white-space: nowrap;
 }
 .badge-ok { background: var(--ok); color: var(--tinta); }
-.badge-bad { background: var(--bad); color: #f9f4da; }
+.badge-bad { background: var(--bad); color: #fff; }
 .badge-warn { background: var(--primary); color: var(--tinta); }
 .badge-gray { background: var(--surface); color: var(--text-2); }
 .badge-gray.tachado { text-decoration: line-through; }
-.badge-purple { background: var(--purple); color: #f9f4da; }
+.badge-purple { background: var(--purple); color: #fff; }
 @keyframes pulso { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
 
 /* Paginación */
@@ -212,7 +228,7 @@ tbody tr:hover { background: color-mix(in srgb, var(--primary) 18%, var(--surfac
 .empty { text-align: center; color: var(--text-2); padding: 40px 12px; font-size: 13px; font-weight: 500; }
 .empty .icon { font-size: 26px; display: block; margin-bottom: 8px; }
 .error-banner {
-  background: var(--bad); border: 2px solid var(--fg); color: #f9f4da;
+  background: var(--bad); border: 2px solid var(--fg); color: #fff;
   border-radius: 0.5rem; box-shadow: 4px 4px 0 var(--fg); padding: 12px 16px; margin: 20px 0;
   display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
   font-weight: 500;
@@ -336,7 +352,7 @@ tbody tr:hover { background: color-mix(in srgb, var(--primary) 18%, var(--surfac
 
 .chat-badge {
   position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px;
-  padding: 0 4px; border-radius: 999px; background: var(--bad); color: #f9f4da;
+  padding: 0 4px; border-radius: 999px; background: var(--bad); color: #fff;
   border: 2px solid var(--fg);
   font-size: 9px; font-weight: 900;
   display: flex; align-items: center; justify-content: center;
@@ -397,7 +413,7 @@ tbody tr:hover { background: color-mix(in srgb, var(--primary) 18%, var(--surfac
   align-self: center; text-align: center; max-width: 90%;
   background: var(--bad); border: 2px solid var(--fg);
   border-radius: 0.5rem; padding: 6px 10px;
-  font-size: 10.5px; font-weight: 700; color: #f9f4da;
+  font-size: 10.5px; font-weight: 700; color: #fff;
 }
 
 .chat-typing { padding: 10px 12px; display: flex; gap: 4px; align-items: center; }

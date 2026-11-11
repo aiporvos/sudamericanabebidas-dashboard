@@ -1,5 +1,5 @@
-// Tema claro/oscuro del panel. Arranca en claro (paleta crema de cluna.ar:
-// #f9f4da + tinta #231f20 + acentos) salvo que el usuario ya haya elegido oscuro.
+// Tema claro/oscuro del panel. Arranca en claro (fondo blanco + colores de marca
+// Sudamericana: azul #455296 y acentos del isotipo) salvo que el usuario elija oscuro.
 export type Tema = 'dark' | 'light';
 
 const CLAVE_TEMA = 'sudamericana_calidad_tema';
