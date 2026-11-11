@@ -4,73 +4,75 @@
    offset abajo-derecha, radius 0.5rem (píldora solo en botones/chips), cero
    gradientes. Claro y oscuro por tokens semánticos. */
 
-/* Paleta de marca Sudamericana de Bebidas: azul del logotipo (#455296) + acentos
-   del isotipo (verde agua, coral, ámbar, violeta). Claro = fondo blanco (default). */
+/* Paleta de marca Sudamericana de Bebidas, extraída de sudamericanadebebidas.com
+   (franja de marca + textos del sitio): azul #304594, celeste #15cef5, lima #abcc45,
+   amarillo #ffc45c, naranja #f48e2b, coral #ff5d5d. Claro = fondo blanco (default).
+   Los tonos "oscurecidos" mantienen contraste con texto blanco encima. */
 :root {
+  --franja-marca: linear-gradient(90deg,
+    #abcc45 0 35.5%, #ffc45c 35.5% 55.6%, #f48e2b 55.6% 72.4%,
+    #ff5d5d 72.4% 85.9%, #15cef5 85.9% 95.2%, #304594 95.2% 100%);
   /* modo oscuro */
-  --bg: #0f1120;
-  --surface: #171a2e;
-  --zebra: #141729;
-  --fg: #e8eaf6;                       /* texto y bordes */
-  --text: #e8eaf6;
-  --text-2: rgba(232, 234, 246, 0.62);
-  --border: #e8eaf6;
-  --border-2: #e8eaf6;
-  /* paleta Sudamericana */
-  --primary: #5b6bc0;                  /* CTAs y acentos principales */
-  --naranja: #e0a030;
-  --ok: #21bb9f;
-  --bad: #f35c60;
-  --warn: #e0a030;
-  --rosa: #f35c60;
-  --purple: #a25071;
-  --celeste: #4ab6c8;
-  --teal: #21bb9f;                     /* alias legado → verde positivo */
-  /* texto sobre acentos */
+  --bg: #0e1226;
+  --surface: #161b35;
+  --zebra: #13182f;
+  --fg: #e6ebf8;
+  --text: #e6ebf8;
+  --text-2: rgba(230, 235, 248, 0.62);
+  --border: #e6ebf8;
+  --border-2: #e6ebf8;
+  --primary: #4a63c9;
+  --naranja: #f48e2b;
+  --ok: #8fb030;
+  --bad: #ff5d5d;
+  --warn: #f48e2b;
+  --rosa: #ff5d5d;
+  --purple: #15a9d0;
+  --celeste: #15cef5;
+  --teal: #8fb030;
   --tinta: #ffffff;
-  /* charts */
-  --serie-ok: #21bb9f;
-  --serie-nook: #f35c60;
-  --serie-rev: #e0a030;
-  --serie-acento: #7d8ad4;
-  --chart-grid: rgba(232, 234, 246, 0.16);
-  --chart-eje: rgba(232, 234, 246, 0.62);
-  --chart-surface: #171a2e;
-  --chart-cursor: rgba(232, 234, 246, 0.08);
-  --tooltip-bg: #171a2e;
-  --tooltip-border: #e8eaf6;
+  --serie-ok: #abcc45;
+  --serie-nook: #ff5d5d;
+  --serie-rev: #ffc45c;
+  --serie-acento: #15cef5;
+  --chart-grid: rgba(230, 235, 248, 0.16);
+  --chart-eje: rgba(230, 235, 248, 0.62);
+  --chart-surface: #161b35;
+  --chart-cursor: rgba(230, 235, 248, 0.08);
+  --tooltip-bg: #161b35;
+  --tooltip-border: #e6ebf8;
   --scheme: dark;
 }
 
 [data-theme='light'] {
   --bg: #ffffff;                       /* fondo blanco */
   --surface: #ffffff;
-  --zebra: #f4f5fb;
-  --fg: #232a5c;                       /* azul marino: texto, bordes y sombras */
-  --text: #1d2245;
-  --text-2: rgba(29, 34, 69, 0.64);
-  --border: #232a5c;
-  --border-2: #232a5c;
-  --primary: #455296;                  /* azul del logotipo */
-  --naranja: #b86e0b;
-  --ok: #138a75;                       /* verde agua del isotipo, oscurecido para contraste */
-  --bad: #d63f45;                      /* coral del isotipo */
-  --warn: #b86e0b;                     /* ámbar del isotipo */
-  --rosa: #d63f45;
-  --purple: #67426e;
-  --celeste: #1f8a9c;
-  --teal: #138a75;
+  --zebra: #f3f6fc;
+  --fg: #263a80;                       /* azul de marca profundo: bordes y sombras */
+  --text: #1b2552;
+  --text-2: rgba(27, 37, 82, 0.64);
+  --border: #263a80;
+  --border-2: #263a80;
+  --primary: #304594;                  /* azul de marca */
+  --naranja: #c96a0e;                  /* naranja #f48e2b oscurecido */
+  --ok: #5f7f17;                       /* lima #abcc45 oscurecido */
+  --bad: #dc4040;                      /* coral #ff5d5d oscurecido */
+  --warn: #c96a0e;
+  --rosa: #dc4040;
+  --purple: #0b80a3;                   /* celeste #15cef5 oscurecido (acento secundario) */
+  --celeste: #0b80a3;
+  --teal: #5f7f17;
   --tinta: #ffffff;
-  --serie-ok: #21bb9f;
-  --serie-nook: #f35c60;
-  --serie-rev: #e0a030;
-  --serie-acento: #455296;
-  --chart-grid: rgba(35, 42, 92, 0.12);
-  --chart-eje: rgba(29, 34, 69, 0.64);
+  --serie-ok: #9cbd36;
+  --serie-nook: #ff5d5d;
+  --serie-rev: #f4a93a;
+  --serie-acento: #15cef5;
+  --chart-grid: rgba(38, 58, 128, 0.12);
+  --chart-eje: rgba(27, 37, 82, 0.64);
   --chart-surface: #ffffff;
-  --chart-cursor: rgba(35, 42, 92, 0.06);
+  --chart-cursor: rgba(38, 58, 128, 0.06);
   --tooltip-bg: #ffffff;
-  --tooltip-border: #232a5c;
+  --tooltip-border: #263a80;
   --scheme: light;
 }
 
@@ -101,6 +103,7 @@ h1, h2, h3, h4, h5, h6 { font-family: 'Paytone One', sans-serif; font-weight: 40
   background: var(--bg);
   border-bottom: 2px solid var(--fg);
 }
+.header::after { content: ''; position: absolute; left: 0; right: 0; bottom: -6px; height: 4px; background: var(--franja-marca); }
 .header-inner {
   max-width: 1400px; margin: 0 auto; padding: 14px 16px;
   display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
@@ -268,9 +271,7 @@ tbody tr:hover { background: color-mix(in srgb, var(--primary) 18%, var(--surfac
 .login-card::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 8px;
   border-bottom: 2px solid var(--fg);
-  background: linear-gradient(90deg,
-    #e0a030 0 16.66%, #54b47d 16.66% 33.33%, #21bb9f 33.33% 50%,
-    #4ab6c8 50% 66.66%, #455296 66.66% 83.33%, #f35c60 83.33% 100%);
+  background: var(--franja-marca);
 }
 .login-title { font-family: 'Paytone One', sans-serif; font-weight: 400; font-size: 16px; letter-spacing: 0.04em; color: var(--text); text-transform: uppercase; }
 .login-sub { font-size: 12px; color: var(--text-2); margin-top: 4px; margin-bottom: 26px; font-weight: 500; }
